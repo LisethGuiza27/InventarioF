@@ -1,1 +1,39 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ehcache xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:noNamespaceSchemaLocation="http://ehcache.org/ehcache.xsd"
+         updateCheck="false">
 
+    <!-- Directorio para almacenar cache en disco -->
+    <diskStore path="java.io.tmpdir/inventario-cache"/>
+
+    <!-- Configuración por defecto -->
+    <defaultCache
+            maxEntriesLocalHeap="1000"
+            eternal="false"
+            timeToIdleSeconds="300"
+            timeToLiveSeconds="600"
+            memoryStoreEvictionPolicy="LRU">
+    </defaultCache>
+
+    <!-- Cache para productos -->
+    <cache name="productos"
+           maxEntriesLocalHeap="500"
+           timeToLiveSeconds="600"
+           overflowToDisk="false">
+    </cache>
+
+    <!-- Cache para estadísticas del dashboard -->
+    <cache name="estadisticas"
+           maxEntriesLocalHeap="100"
+           timeToLiveSeconds="300"
+           overflowToDisk="false">
+    </cache>
+
+    <!-- Cache para usuarios -->
+    <cache name="usuarios"
+           maxEntriesLocalHeap="200"
+           timeToLiveSeconds="1800"
+           overflowToDisk="false">
+    </cache>
+
+</ehcache>

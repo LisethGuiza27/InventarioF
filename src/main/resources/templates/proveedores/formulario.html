@@ -1,0 +1,62 @@
+<!-- src/main/resources/templates/proveedores/formulario.html -->
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Formulario Proveedor</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+</head>
+<body>
+    <div class="container mt-4">
+        <h2>Formulario Proveedor</h2>
+        
+        <form th:action="@{/proveedores}" th:method="post" th:object="${proveedor}">
+            <input type="hidden" th:field="*{id}">
+            
+            <div class="row">
+                <div class="col-md-6 mb-3">
+                    <label>Código:</label>
+                    <input type="text" class="form-control" th:field="*{codigo}" required>
+                </div>
+                
+                <div class="col-md-6 mb-3">
+                    <label>Nombre:</label>
+                    <input type="text" class="form-control" th:field="*{nombre}" required>
+                </div>
+            </div>
+            
+            <div class="row">
+                <div class="col-md-6 mb-3">
+                    <label>Razón Social:</label>
+                    <input type="text" class="form-control" th:field="*{razonSocial}">
+                </div>
+                
+                <div class="col-md-6 mb-3">
+                    <label>RUC:</label>
+                    <input type="text" class="form-control" th:field="*{ruc}">
+                </div>
+            </div>
+            
+            <div class="row">
+                <div class="col-md-6 mb-3">
+                    <label>Teléfono:</label>
+                    <input type="text" class="form-control" th:field="*{telefono}">
+                </div>
+                
+                <div class="col-md-6 mb-3">
+                    <label>Email:</label>
+                    <input type="email" class="form-control" th:field="*{email}">
+                </div>
+            </div>
+            
+            <div class="mb-3">
+                <label>Dirección:</label>
+                <input type="text" class="form-control" th:field="*{direccion}">
+            </div>
+            
+            <button type="submit" class="btn btn-primary">Guardar</button>
+            <a href="/proveedores" class="btn btn-secondary">Cancelar</a>
+        </form>
+    </div>
+</body>
+</html>

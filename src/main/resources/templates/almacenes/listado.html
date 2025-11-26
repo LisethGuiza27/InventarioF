@@ -1,1 +1,43 @@
+<!-- src/main/resources/templates/almacenes/listado.html -->
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Almacenes</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
+</head>
+<body>
+    <div class="container mt-4">
+        <h2><i class="bi bi-building"></i> Almacenes</h2>
+        
+        <a href="/almacenes/nuevo" class="btn btn-success mb-3">
+            <i class="bi bi-plus-circle"></i> Nuevo Almacén
+        </a>
 
+        <table class="table table-striped">
+            <thead>
+                <tr>
+                    <th>Código</th>
+                    <th>Nombre</th>
+                    <th>Ciudad</th>
+                    <th>Responsable</th>
+                    <th>Acciones</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr th:each="a : ${almacenes}">
+                    <td th:text="${a.codigo}"></td>
+                    <td th:text="${a.nombre}"></td>
+                    <td th:text="${a.ciudad}"></td>
+                    <td th:text="${a.usuarioResponsable?.nombreCompleto}"></td>
+                    <td>
+                        <a th:href="@{/almacenes/{id}/editar(id=${a.id})}" class="btn btn-sm btn-primary">Editar</a>
+                        <a th:href="@{/almacenes/{id}/inventario(id=${a.id})}" class="btn btn-sm btn-info">Inventario</a>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+</body>
+</html>

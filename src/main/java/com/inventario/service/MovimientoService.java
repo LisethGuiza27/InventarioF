@@ -25,6 +25,28 @@ public class MovimientoService {
     
     @Autowired
     private ProductoRepository productoRepo;
+    
+    // Movimientos de hoy
+    public List<Movimiento> obtenerMovimientosHoy() {
+        return movimientoRepo.findMovimientosHoy();
+    }
+    
+    // Contar movimientos de hoy
+    public long contarMovimientosHoy() {
+        return movimientoRepo.countMovimientosHoy();
+    }
+    
+    // Obtener por tipo
+    public List<Movimiento> obtenerPorTipo(Movimiento.TipoMovimiento tipo) {
+        return movimientoRepo.findByTipo(tipo);
+    }
+    
+    // Obtener por rango de fechas
+    public List<Movimiento> obtenerPorRangoFechas(LocalDate desde, LocalDate hasta) {
+        LocalDateTime inicio = desde.atStartOfDay();
+        LocalDateTime fin = hasta.atTime(23, 59, 59);
+        return movimientoRepo.findByFechaBetween(inicio, fin);
+    }
 
     // Listar todos
     public List<Movimiento> listarTodos() {
@@ -41,16 +63,6 @@ public class MovimientoService {
         return movimientoRepo.findAllOrderByFechaDesc().stream()
                 .limit(limite)
                 .toList();
-    }
-    
-    // Movimientos de hoy
-    public List<Movimiento> obtenerMovimientosHoy() {
-        return movimientoRepo.findMovimientosHoy();
-    }
-    
-    // Contar movimientos de hoy
-    public long contarMovimientosHoy() {
-        return movimientoRepo.countMovimientosHoy();
     }
     
     // Crear movimiento de entrada
@@ -212,6 +224,7 @@ public class MovimientoService {
             }
         }
     }
+    
     
     // Generar código único
     private String generarCodigo(String prefijo) {

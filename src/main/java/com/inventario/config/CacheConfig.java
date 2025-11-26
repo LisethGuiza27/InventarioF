@@ -1,13 +1,11 @@
-/*
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
- */
 package com.inventario.config;
 
-/**
- *
- * @author Liseth
- */
+import org.springframework.cache.annotation.EnableCaching;
+import org.springframework.context.annotation.Configuration;
+
+@Configuration
+@EnableCaching
 public class CacheConfig {
-    
+    // Configuración de caché habilitada mediante @EnableCaching
+    // La configuración específica está en application.yml y ehcache.xml
 }

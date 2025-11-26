@@ -1,1 +1,58 @@
-
+<!-- src/main/resources/templates/reportes/index.html -->
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Reportes</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
+</head>
+<body>
+    <div class="container mt-4">
+        <h2><i class="bi bi-graph-up"></i> Reportes</h2>
+        
+        <div class="row mt-4">
+            <div class="col-md-4 mb-3">
+                <div class="card">
+                    <div class="card-body">
+                        <h5><i class="bi bi-box-seam"></i> Reporte de Inventario</h5>
+                        <p>Reporte general del inventario actual</p>
+                        <a href="/reportes/inventario" class="btn btn-primary">Ver Reporte</a>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="col-md-4 mb-3">
+                <div class="card">
+                    <div class="card-body">
+                        <h5><i class="bi bi-arrow-left-right"></i> Movimientos</h5>
+                        <p>Reporte de movimientos por periodo</p>
+                        <a href="/reportes/movimientos?desde=2024-01-01&hasta=2024-12-31" 
+                           class="btn btn-primary">Ver Reporte</a>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="col-md-4 mb-3">
+                <div class="card">
+                    <div class="card-body">
+                        <h5><i class="bi bi-exclamation-triangle"></i> Stock Bajo</h5>
+                        <p>Productos con stock bajo o agotado</p>
+                        <a href="/reportes/stock-bajo" class="btn btn-primary">Ver Reporte</a>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="col-md-4 mb-3">
+                <div class="card">
+                    <div class="card-body">
+                        <h5><i class="bi bi-currency-dollar"></i> Valoración</h5>
+                        <p>Valoración del inventario</p>
+                        <a href="/reportes/valoracion" class="btn btn-primary">Ver Reporte</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>
