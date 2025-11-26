@@ -1,7 +1,5 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org" 
-      xmlns:sec="http://www.thymeleaf.org/extras/spring-security"
-      lang="es">
+<html lang="es">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -523,7 +521,8 @@
                 <h2>Dashboard</h2>
                 <p style="margin: 5px 0 0 0; color: var(--gray);">
                     <i class="bi bi-calendar3"></i> 
-                    <span th:text="${#temporals.format(fechaActual, 'EEEE, dd \'de\' MMMM yyyy', new java.util.Locale('es', 'ES'))}">Hoy, 26 de Noviembre 2025</span>
+                    <span th:text="${#temporals.format(fechaActual, 'EEEE, dd ''de'' MMMM yyyy', new java.util.Locale('es', 'ES'))}">Hoy, 26 de Noviembre 2025</span>
+
                 </p>
             </div>
             <div class="header-actions">
