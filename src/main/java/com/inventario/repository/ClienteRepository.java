@@ -1,13 +1,25 @@
-/*
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
- */
 package com.inventario.repository;
 
-/**
- *
- * @author Liseth
- */
-public class ClienteRepository {
+import com.inventario.model.Cliente;
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.stereotype.Repository;
+import java.time.LocalDateTime;
+import java.util.List;
+import java.util.Optional;
+
+@Repository
+public interface ClienteRepository extends JpaRepository<Cliente, Integer> {
+    Optional<Cliente> findByCodigo(String codigo);
+    Optional<Cliente> findByNumeroDocumento(String numeroDocumento);
+    List<Cliente> findByActivoTrue();
     
+    @Query("SELECT c FROM Cliente c WHERE c.nombre LIKE %:termino% OR c.codigo LIKE %:termino%")
+    List<Cliente> buscar(String termino);
+    
+    @Query("SELECT c FROM Cliente c WHERE c.saldoPendiente > 0")
+    List<Cliente> findConSaldoPendiente();
+    
+    @Query("SELECT c FROM Cliente c WHERE c.fechaUltimaCompra >= :fechaInicio")
+    List<Cliente> findClientesActivos(LocalDateTime fechaInicio);
 }

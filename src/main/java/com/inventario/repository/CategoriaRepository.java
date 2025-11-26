@@ -1,13 +1,19 @@
-/*
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
- */
 package com.inventario.repository;
 
-/**
- *
- * @author Liseth
- */
-public class CategoriaRepository {
+import com.inventario.model.Categoria;
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.stereotype.Repository;
+import java.util.List;
+import java.util.Optional;
+
+@Repository
+public interface CategoriaRepository extends JpaRepository<Categoria, Integer> {
+    Optional<Categoria> findByCodigo(String codigo);
+    List<Categoria> findByActivoTrue();
+    List<Categoria> findByCategoriaPadreIsNull();
+    List<Categoria> findByCategoriaPadreId(Integer categoriaPadreId);
     
+    @Query("SELECT c FROM Categoria c WHERE c.nombre LIKE %:nombre%")
+    List<Categoria> buscarPorNombre(String nombre);
 }

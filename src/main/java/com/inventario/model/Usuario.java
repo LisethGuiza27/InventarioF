@@ -1,5 +1,6 @@
 package com.inventario.model;
 
+import com.inventario.service.Rol;
 import jakarta.persistence.*;
 import java.time.LocalDateTime;
 
