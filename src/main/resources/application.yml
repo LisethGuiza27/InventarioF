@@ -1,40 +1,326 @@
+# ========================================
+# CONFIGURACIÓN GENERAL
+# ========================================
 spring:
   application:
-    name: inventario-app
+    name: inventario-avanzado
 
-  # DataSource MySQL
+  # ========================================
+  # DATASOURCE (MySQL)
+  # ========================================
   datasource:
-    url: jdbc:mysql://localhost:3306/inventariodb?useSSL=false&serverTimezone=UTC
+    url: jdbc:mysql://localhost:3306/inventariodb?useSSL=false&serverTimezone=UTC&allowPublicKeyRetrieval=true&createDatabaseIfNotExist=true
     username: root
     password: root123
     driver-class-name: com.mysql.cj.jdbc.Driver
+    
+    # Connection Pool (HikariCP)
+    hikari:
+      maximum-pool-size: 20
+      minimum-idle: 5
+      connection-timeout: 30000
+      idle-timeout: 600000
+      max-lifetime: 1800000
+      pool-name: InventarioHikariPool
 
-  # JPA/Hibernate
+  # ========================================
+  # JPA/HIBERNATE
+  # ========================================
   jpa:
     hibernate:
-      ddl-auto: update
+      ddl-auto: update  # Opciones: none, validate, update, create, create-drop
+      naming:
+        physical-strategy: org.hibernate.boot.model.naming.PhysicalNamingStrategyStandardImpl
+    
     show-sql: true
+    
     properties:
       hibernate:
         dialect: org.hibernate.dialect.MySQL8Dialect
         format_sql: true
+        use_sql_comments: true
+        jdbc:
+          batch_size: 20
+          order_inserts: true
+          order_updates: true
+        cache:
+          use_second_level_cache: true
+          use_query_cache: true
+          region:
+            factory_class: org.ehcache.jcache.JCacheCacheRegionFactory
 
-  # Thymeleaf
+  # ========================================
+  # THYMELEAF
+  # ========================================
   thymeleaf:
     mode: HTML
     encoding: UTF-8
-    cache: false
+    cache: false  # true en producción
+    prefix: classpath:/templates/
+    suffix: .html
 
-# Servidor
+  # ========================================
+  # SPRING SECURITY
+  # ========================================
+  security:
+    user:
+      name: admin
+      password: admin123  # Solo para desarrollo inicial
+
+  # ========================================
+  # MULTIPART (Subida de archivos)
+  # ========================================
+  servlet:
+    multipart:
+      enabled: true
+      max-file-size: 10MB
+      max-request-size: 10MB
+      file-size-threshold: 2KB
+
+  # ========================================
+  # MENSAJES Y LOCALIZACIÓN
+  # ========================================
+  messages:
+    basename: messages
+    encoding: UTF-8
+    cache-duration: 3600
+
+  # ========================================
+  # MAIL (Notificaciones por correo)
+  # ========================================
+  mail:
+    host: smtp.gmail.com
+    port: 587
+    username: tu-email@gmail.com
+    password: tu-app-password
+    properties:
+      mail:
+        smtp:
+          auth: true
+          starttls:
+            enable: true
+          timeout: 5000
+          writetimeout: 5000
+
+  # ========================================
+  # CACHE
+  # ========================================
+  cache:
+    type: ehcache
+    ehcache:
+      config: classpath:ehcache.xml
+
+  # ========================================
+  # JACKSON (JSON)
+  # ========================================
+  jackson:
+    serialization:
+      write-dates-as-timestamps: false
+      indent-output: true
+    time-zone: America/Mexico_City
+    date-format: yyyy-MM-dd'T'HH:mm:ss
+
+# ========================================
+# SERVIDOR
+# ========================================
 server:
   port: 8080
   servlet:
     context-path: /
+    session:
+      timeout: 30m
+      cookie:
+        http-only: true
+        secure: false  # true en producción con HTTPS
+  
+  compression:
+    enabled: true
+    mime-types: text/html,text/xml,text/plain,text/css,application/javascript,application/json
+    min-response-size: 1024
 
-# Logging
+  error:
+    include-message: always
+    include-stacktrace: on_param
+    include-exception: false
+    whitelabel:
+      enabled: false
+
+# ========================================
+# ACTUATOR (Monitoreo)
+# ========================================
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,metrics,prometheus
+      base-path: /actuator
+  
+  endpoint:
+    health:
+      show-details: when-authorized
+  
+  metrics:
+    export:
+      prometheus:
+        enabled: true
+
+# ========================================
+# LOGGING
+# ========================================
 logging:
   level:
     root: INFO
     com.inventario: DEBUG
-    org.springframework.web: DEBUG
+    org.springframework.web: INFO
+    org.springframework.security: DEBUG
     org.hibernate.SQL: DEBUG
+    org.hibernate.type.descriptor.sql.BasicBinder: TRACE
+  
+  pattern:
+    console: "%d{yyyy-MM-dd HH:mm:ss} - %msg%n"
+    file: "%d{yyyy-MM-dd HH:mm:ss} [%thread] %-5level %logger{36} - %msg%n"
+  
+  file:
+    name: logs/inventario.log
+    max-size: 10MB
+    max-history: 30
+
+# ========================================
+# CONFIGURACIÓN PERSONALIZADA
+# ========================================
+inventario:
+  # Seguridad
+  security:
+    jwt:
+      secret: tu-clave-secreta-muy-segura-y-larga-aqui
+      expiration: 86400000  # 24 horas en milisegundos
+    
+    password:
+      min-length: 8
+      require-uppercase: true
+      require-lowercase: true
+      require-digit: true
+      require-special: true
+    
+    session:
+      max-concurrent: 1
+      timeout: 1800  # 30 minutos
+  
+  # Archivos
+  files:
+    upload-dir: uploads/
+    allowed-extensions: jpg,jpeg,png,pdf,xlsx,xls,csv
+    max-size: 10485760  # 10 MB
+  
+  # Imágenes
+  images:
+    product-images-dir: uploads/productos/
+    max-width: 1920
+    max-height: 1080
+    thumbnail-size: 300
+  
+  # Reportes
+  reports:
+    output-dir: reports/
+    formats: pdf,xlsx,csv
+  
+  # Códigos de barras
+  barcode:
+    format: EAN_13
+    width: 300
+    height: 100
+  
+  # Inventario
+  inventory:
+    auto-reorder: true
+    alert-days-before-expiry: 30
+    low-stock-notification: true
+    critical-stock-percentage: 10
+  
+  # Notificaciones
+  notifications:
+    email-enabled: true
+    sms-enabled: false
+    push-enabled: false
+    admin-email: admin@inventario.com
+  
+  # Backup
+  backup:
+    enabled: true
+    auto-backup: true
+    schedule: "0 0 2 * * ?"  # Diario a las 2:00 AM
+    retention-days: 30
+    backup-dir: backups/
+
+# ========================================
+# CONFIGURACIÓN POR PERFIL
+# ========================================
+---
+# DESARROLLO
+spring:
+  config:
+    activate:
+      on-profile: dev
+
+  datasource:
+    url: jdbc:mysql://localhost:3306/inventariodb?useSSL=false&serverTimezone=UTC
+    
+  jpa:
+    hibernate:
+      ddl-auto: update
+    show-sql: true
+
+logging:
+  level:
+    root: DEBUG
+
+---
+# PRODUCCIÓN
+spring:
+  config:
+    activate:
+      on-profile: prod
+
+  datasource:
+    url: jdbc:mysql://production-server:3306/inventariodb?useSSL=true&serverTimezone=UTC
+    
+  jpa:
+    hibernate:
+      ddl-auto: validate
+    show-sql: false
+
+  thymeleaf:
+    cache: true
+
+server:
+  servlet:
+    session:
+      cookie:
+        secure: true
+
+logging:
+  level:
+    root: WARN
+    com.inventario: INFO
+
+---
+# TESTING
+spring:
+  config:
+    activate:
+      on-profile: test
+
+  datasource:
+    url: jdbc:h2:mem:testdb
+    driver-class-name: org.h2.Driver
+    username: sa
+    password:
+
+  jpa:
+    hibernate:
+      ddl-auto: create-drop
+    show-sql: false
+
+  h2:
+    console:
+      enabled: true
