@@ -1,7 +1,9 @@
 package com.inventario.model;
 
-import com.inventario.service.Rol;
 import jakarta.persistence.*;
+import jakarta.validation.constraints.Email;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Size;
 import java.time.LocalDateTime;
 
 @Entity
@@ -12,15 +14,22 @@ public class Usuario {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
     
+    @NotBlank(message = "El username es obligatorio")
+    @Size(min = 4, max = 50)
     @Column(nullable = false, unique = true, length = 50)
     private String username;
     
+    @NotBlank(message = "La contraseña es obligatoria")
+    @Size(min = 8, max = 255)
     @Column(nullable = false, length = 255)
     private String password;
     
+    @NotBlank(message = "El nombre completo es obligatorio")
+    @Size(min = 3, max = 150)
     @Column(name = "nombre_completo", nullable = false, length = 150)
     private String nombreCompleto;
     
+    @Email(message = "Email inválido")
     @Column(length = 100, unique = true)
     private String email;
     
@@ -168,6 +177,7 @@ public class Usuario {
         return updatedAt;
     }
 
+    // Métodos de utilidad
     public boolean estaBloqueado() {
         if (bloqueadoHasta == null) return false;
         return LocalDateTime.now().isBefore(bloqueadoHasta);

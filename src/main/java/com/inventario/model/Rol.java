@@ -1,6 +1,8 @@
 package com.inventario.model;
 
 import jakarta.persistence.*;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Size;
 import java.time.LocalDateTime;
 import java.util.HashSet;
 import java.util.Set;
@@ -13,6 +15,8 @@ public class Rol {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
     
+    @NotBlank(message = "El nombre del rol es obligatorio")
+    @Size(min = 3, max = 50)
     @Column(nullable = false, unique = true, length = 50)
     private String nombre;
     

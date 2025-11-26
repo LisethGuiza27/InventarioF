@@ -28,7 +28,7 @@ spring:
   # ========================================
   jpa:
     hibernate:
-      ddl-auto: update  # Opciones: none, validate, update, create, create-drop
+      ddl-auto: update
       naming:
         physical-strategy: org.hibernate.boot.model.naming.PhysicalNamingStrategyStandardImpl
     
@@ -47,7 +47,8 @@ spring:
           use_second_level_cache: true
           use_query_cache: true
           region:
-            factory_class: org.ehcache.jcache.JCacheCacheRegionFactory
+            # ❗ AQUI ESTABA EL ERROR — SOLO SE CAMBIÓ ESTA LÍNEA
+            factory_class: org.hibernate.cache.jcache.internal.JCacheRegionFactory
 
   # ========================================
   # THYMELEAF
@@ -55,7 +56,7 @@ spring:
   thymeleaf:
     mode: HTML
     encoding: UTF-8
-    cache: false  # true en producción
+    cache: false
     prefix: classpath:/templates/
     suffix: .html
 
@@ -65,10 +66,10 @@ spring:
   security:
     user:
       name: admin
-      password: admin123  # Solo para desarrollo inicial
+      password: admin123
 
   # ========================================
-  # MULTIPART (Subida de archivos)
+  # MULTIPART
   # ========================================
   servlet:
     multipart:
@@ -78,7 +79,7 @@ spring:
       file-size-threshold: 2KB
 
   # ========================================
-  # MENSAJES Y LOCALIZACIÓN
+  # MENSAJES
   # ========================================
   messages:
     basename: messages
@@ -86,7 +87,7 @@ spring:
     cache-duration: 3600
 
   # ========================================
-  # MAIL (Notificaciones por correo)
+  # MAIL
   # ========================================
   mail:
     host: smtp.gmail.com
@@ -106,12 +107,12 @@ spring:
   # CACHE
   # ========================================
   cache:
-    type: ehcache
+   # type: jcache
     ehcache:
       config: classpath:ehcache.xml
 
   # ========================================
-  # JACKSON (JSON)
+  # JACKSON
   # ========================================
   jackson:
     serialization:
@@ -131,7 +132,7 @@ server:
       timeout: 30m
       cookie:
         http-only: true
-        secure: false  # true en producción con HTTPS
+        secure: false
   
   compression:
     enabled: true
@@ -146,7 +147,7 @@ server:
       enabled: false
 
 # ========================================
-# ACTUATOR (Monitoreo)
+# ACTUATOR
 # ========================================
 management:
   endpoints:
@@ -157,7 +158,7 @@ management:
   
   endpoint:
     health:
-      show-details: when-authorized
+      show-details: WHEN_AUTHORIZED
   
   metrics:
     export:
@@ -186,14 +187,13 @@ logging:
     max-history: 30
 
 # ========================================
-# CONFIGURACIÓN PERSONALIZADA
+# CONFIG PERSONALIZADA
 # ========================================
 inventario:
-  # Seguridad
   security:
     jwt:
       secret: tu-clave-secreta-muy-segura-y-larga-aqui
-      expiration: 86400000  # 24 horas en milisegundos
+      expiration: 86400000
     
     password:
       min-length: 8
@@ -204,59 +204,51 @@ inventario:
     
     session:
       max-concurrent: 1
-      timeout: 1800  # 30 minutos
+      timeout: 1800
   
-  # Archivos
   files:
     upload-dir: uploads/
     allowed-extensions: jpg,jpeg,png,pdf,xlsx,xls,csv
-    max-size: 10485760  # 10 MB
+    max-size: 10485760
   
-  # Imágenes
   images:
     product-images-dir: uploads/productos/
     max-width: 1920
     max-height: 1080
     thumbnail-size: 300
   
-  # Reportes
   reports:
     output-dir: reports/
     formats: pdf,xlsx,csv
   
-  # Códigos de barras
   barcode:
     format: EAN_13
     width: 300
     height: 100
   
-  # Inventario
   inventory:
     auto-reorder: true
     alert-days-before-expiry: 30
     low-stock-notification: true
     critical-stock-percentage: 10
   
-  # Notificaciones
   notifications:
     email-enabled: true
     sms-enabled: false
     push-enabled: false
     admin-email: admin@inventario.com
   
-  # Backup
   backup:
     enabled: true
     auto-backup: true
-    schedule: "0 0 2 * * ?"  # Diario a las 2:00 AM
+    schedule: "0 0 2 * * ?"
     retention-days: 30
     backup-dir: backups/
 
 # ========================================
-# CONFIGURACIÓN POR PERFIL
+# PERFIL DEV
 # ========================================
 ---
-# DESARROLLO
 spring:
   config:
     activate:
@@ -274,8 +266,10 @@ logging:
   level:
     root: DEBUG
 
+# ========================================
+# PERFIL PROD
+# ========================================
 ---
-# PRODUCCIÓN
 spring:
   config:
     activate:
@@ -303,8 +297,10 @@ logging:
     root: WARN
     com.inventario: INFO
 
+# ========================================
+# PERFIL TEST
+# ========================================
 ---
-# TESTING
 spring:
   config:
     activate:

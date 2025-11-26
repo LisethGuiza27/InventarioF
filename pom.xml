@@ -25,6 +25,8 @@
         <maven.compiler.source>17</maven.compiler.source>
         <maven.compiler.target>17</maven.compiler.target>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <!-- CLASE PRINCIPAL DEFINIDA -->
+        <start-class>com.inventario.InventarioSpringBootApplication</start-class>
     </properties>
 
     <dependencies>
@@ -58,11 +60,11 @@
             <artifactId>thymeleaf-extras-springsecurity6</artifactId>
         </dependency>
 
-        <!-- MySQL Connector -->
+        <!-- MySQL Connector (versión actualizada) -->
         <dependency>
-            <groupId>mysql</groupId>
-            <artifactId>mysql-connector-java</artifactId>
-            <version>8.0.33</version>
+            <groupId>com.mysql</groupId>
+            <artifactId>mysql-connector-j</artifactId>
+            <version>8.2.0</version>
         </dependency>
 
         <!-- Lombok -->
@@ -203,10 +205,8 @@
             <plugin>
                 <groupId>org.springframework.boot</groupId>
                 <artifactId>spring-boot-maven-plugin</artifactId>
-                <version>3.2.0</version>
                 <configuration>
                     <mainClass>com.inventario.InventarioSpringBootApplication</mainClass>
-                    <skip>false</skip>
                     <excludes>
                         <exclude>
                             <groupId>org.projectlombok</groupId>
@@ -248,15 +248,13 @@
                 <version>3.0.0</version>
             </plugin>
 
-            <!-- Flyway para migraciones de BD (opcional) -->
+            <!-- Exec Maven Plugin para ejecutar -->
             <plugin>
-                <groupId>org.flywaydb</groupId>
-                <artifactId>flyway-maven-plugin</artifactId>
-                <version>9.22.0</version>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>exec-maven-plugin</artifactId>
+                <version>3.1.0</version>
                 <configuration>
-                    <url>jdbc:mysql://localhost:3306/inventariodb</url>
-                    <user>root</user>
-                    <password>root123</password>
+                    <mainClass>com.inventario.InventarioSpringBootApplication</mainClass>
                 </configuration>
             </plugin>
         </plugins>
