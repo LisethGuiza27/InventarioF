@@ -1,0 +1,565 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Alertas - Sistema de Inventario</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #4f46e5;
+            --success: #10b981;
+            --warning: #f59e0b;
+            --danger: #ef4444;
+            --dark: #0f172a;
+            --gray: #64748b;
+            --gray-light: #f1f5f9;
+            --white: #ffffff;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+        }
+
+        .sidebar {
+            position: fixed;
+            left: 0;
+            top: 0;
+            width: 260px;
+            height: 100vh;
+            background: var(--dark);
+            padding: 20px 0;
+            overflow-y: auto;
+            z-index: 1000;
+        }
+
+        .sidebar-logo {
+            padding: 0 25px 30px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            margin-bottom: 20px;
+        }
+
+        .sidebar-logo h1 {
+            color: var(--white);
+            font-size: 24px;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .sidebar-menu {
+            padding: 0 15px;
+        }
+
+        .menu-item {
+            display: block;
+            padding: 12px 20px;
+            color: rgba(255, 255, 255, 0.7);
+            text-decoration: none;
+            border-radius: 8px;
+            margin-bottom: 5px;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-weight: 500;
+        }
+
+        .menu-item:hover {
+            background: rgba(255, 255, 255, 0.1);
+            color: var(--white);
+        }
+
+        .menu-item.active {
+            background: var(--primary);
+            color: var(--white);
+        }
+
+        .main-content {
+            margin-left: 260px;
+            padding: 30px;
+        }
+
+        .page-header {
+            background: var(--white);
+            padding: 25px 30px;
+            border-radius: 16px;
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+            margin-bottom: 30px;
+        }
+
+        .alert-item {
+            background: var(--white);
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 15px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            border-left: 4px solid;
+            display: flex;
+            align-items: start;
+            gap: 15px;
+            transition: all 0.3s ease;
+            animation: slideIn 0.4s ease;
+        }
+
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateX(-20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+
+        .alert-item:hover {
+            transform: translateX(5px);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+        }
+
+        .alert-item.critica {
+            border-left-color: var(--danger);
+            background: linear-gradient(to right, rgba(239, 68, 68, 0.05), white);
+        }
+
+        .alert-item.alta {
+            border-left-color: var(--warning);
+            background: linear-gradient(to right, rgba(245, 158, 11, 0.05), white);
+        }
+
+        .alert-item.media {
+            border-left-color: var(--primary);
+            background: linear-gradient(to right, rgba(79, 70, 229, 0.05), white);
+        }
+
+        .alert-item.baja {
+            border-left-color: var(--success);
+            background: linear-gradient(to right, rgba(16, 185, 129, 0.05), white);
+        }
+
+        .alert-icon {
+            width: 50px;
+            height: 50px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+            flex-shrink: 0;
+        }
+
+        .alert-item.critica .alert-icon {
+            background: rgba(239, 68, 68, 0.1);
+            color: var(--danger);
+        }
+
+        .alert-item.alta .alert-icon {
+            background: rgba(245, 158, 11, 0.1);
+            color: var(--warning);
+        }
+
+        .alert-item.media .alert-icon {
+            background: rgba(79, 70, 229, 0.1);
+            color: var(--primary);
+        }
+
+        .alert-item.baja .alert-icon {
+            background: rgba(16, 185, 129, 0.1);
+            color: var(--success);
+        }
+
+        .alert-content {
+            flex: 1;
+        }
+
+        .alert-title {
+            font-size: 16px;
+            font-weight: 600;
+            color: var(--dark);
+            margin-bottom: 5px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .alert-message {
+            font-size: 14px;
+            color: var(--gray);
+            margin-bottom: 10px;
+        }
+
+        .alert-meta {
+            font-size: 12px;
+            color: var(--gray);
+            display: flex;
+            gap: 15px;
+        }
+
+        .badge {
+            padding: 6px 12px;
+            border-radius: 6px;
+            font-size: 11px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .badge-critica {
+            background: rgba(239, 68, 68, 0.1);
+            color: var(--danger);
+        }
+
+        .badge-alta {
+            background: rgba(245, 158, 11, 0.1);
+            color: var(--warning);
+        }
+
+        .badge-media {
+            background: rgba(79, 70, 229, 0.1);
+            color: var(--primary);
+        }
+
+        .badge-baja {
+            background: rgba(16, 185, 129, 0.1);
+            color: var(--success);
+        }
+
+        .alert-actions {
+            display: flex;
+            gap: 10px;
+            flex-shrink: 0;
+        }
+
+        .btn-modern {
+            padding: 8px 16px;
+            border-radius: 8px;
+            font-weight: 600;
+            font-size: 13px;
+            border: none;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            text-decoration: none;
+        }
+
+        .btn-primary {
+            background: var(--primary);
+            color: white;
+        }
+
+        .btn-secondary {
+            background: var(--gray-light);
+            color: var(--gray);
+        }
+
+        .btn-modern:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+        }
+
+        .filter-tabs {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 25px;
+            flex-wrap: wrap;
+        }
+
+        .filter-tab {
+            padding: 10px 20px;
+            border-radius: 10px;
+            background: white;
+            border: 2px solid transparent;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .filter-tab:hover {
+            border-color: var(--primary);
+        }
+
+        .filter-tab.active {
+            background: var(--primary);
+            color: white;
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 60px 20px;
+            background: white;
+            border-radius: 16px;
+        }
+
+        .empty-state i {
+            font-size: 64px;
+            color: var(--gray-light);
+            margin-bottom: 20px;
+        }
+    </style>
+</head>
+<body>
+    <!-- Sidebar -->
+    <nav class="sidebar">
+        <div class="sidebar-logo">
+            <h1><i class="bi bi-boxes"></i> InventaPro</h1>
+        </div>
+        <div class="sidebar-menu">
+            <a href="/dashboard" class="menu-item">
+                <i class="bi bi-speedometer2"></i> Dashboard
+            </a>
+            <a href="/productos" class="menu-item">
+                <i class="bi bi-box-seam"></i> Productos
+            </a>
+            <a href="/movimientos" class="menu-item">
+                <i class="bi bi-arrow-left-right"></i> Movimientos
+            </a>
+            <a href="/almacenes" class="menu-item">
+                <i class="bi bi-building"></i> Almacenes
+            </a>
+            <a href="/proveedores" class="menu-item">
+                <i class="bi bi-truck"></i> Proveedores
+            </a>
+            <a href="/clientes" class="menu-item">
+                <i class="bi bi-people"></i> Clientes
+            </a>
+            <a href="/reportes" class="menu-item">
+                <i class="bi bi-graph-up"></i> Reportes
+            </a>
+            <a href="/alertas" class="menu-item active">
+                <i class="bi bi-bell"></i> Alertas
+            </a>
+            <a href="/usuarios" class="menu-item">
+                <i class="bi bi-person-gear"></i> Usuarios
+            </a>
+            <a href="/logout" class="menu-item">
+                <i class="bi bi-box-arrow-right"></i> Cerrar Sesión
+            </a>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <div class="main-content">
+        <div class="page-header">
+            <div style="display: flex; justify-content: space-between; align-items: center;">
+                <div>
+                    <h2><i class="bi bi-bell"></i> Centro de Alertas</h2>
+                    <p style="color: var(--gray); margin: 5px 0 0 0;">Mantente al tanto de eventos importantes en tu inventario</p>
+                </div>
+                <button class="btn-modern btn-secondary" onclick="marcarTodasLeidas()">
+                    <i class="bi bi-check-all"></i> Marcar todas como leídas
+                </button>
+            </div>
+        </div>
+
+        <!-- Filtros -->
+        <div class="filter-tabs">
+            <div class="filter-tab active" data-filter="todas">
+                <i class="bi bi-list-ul"></i> Todas (<span id="count-todas">0</span>)
+            </div>
+            <div class="filter-tab" data-filter="critica">
+                <i class="bi bi-exclamation-octagon"></i> Críticas (<span id="count-critica">0</span>)
+            </div>
+            <div class="filter-tab" data-filter="alta">
+                <i class="bi bi-exclamation-triangle"></i> Altas (<span id="count-alta">0</span>)
+            </div>
+            <div class="filter-tab" data-filter="media">
+                <i class="bi bi-info-circle"></i> Medias (<span id="count-media">0</span>)
+            </div>
+        </div>
+
+        <!-- Alertas -->
+        <div id="alertasContainer">
+            <!-- Alerta CRITICA ejemplo -->
+            <div class="alert-item critica" data-prioridad="critica">
+                <div class="alert-icon">
+                    <i class="bi bi-x-circle"></i>
+                </div>
+                <div class="alert-content">
+                    <div class="alert-title">
+                        <span>Producto Agotado</span>
+                        <span class="badge badge-critica">Crítica</span>
+                    </div>
+                    <div class="alert-message">
+                        El producto "Mouse Inalámbrico Logitech" se encuentra completamente agotado. Se recomienda reabastecimiento inmediato.
+                    </div>
+                    <div class="alert-meta">
+                        <span><i class="bi bi-box-seam"></i> PROD002</span>
+                        <span><i class="bi bi-clock"></i> Hace 2 horas</span>
+                    </div>
+                </div>
+                <div class="alert-actions">
+                    <a href="/productos/2/editar" class="btn-modern btn-primary">
+                        <i class="bi bi-pencil"></i> Ver Producto
+                    </a>
+                    <button class="btn-modern btn-secondary" onclick="marcarLeida(this)">
+                        <i class="bi bi-check"></i>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Alerta ALTA ejemplo -->
+            <div class="alert-item alta" data-prioridad="alta">
+                <div class="alert-icon">
+                    <i class="bi bi-exclamation-triangle"></i>
+                </div>
+                <div class="alert-content">
+                    <div class="alert-title">
+                        <span>Stock Bajo</span>
+                        <span class="badge badge-alta">Alta</span>
+                    </div>
+                    <div class="alert-message">
+                        El producto "Zapatos Deportivos" tiene solo 2 unidades disponibles. Stock mínimo: 8 unidades.
+                    </div>
+                    <div class="alert-meta">
+                        <span><i class="bi bi-box-seam"></i> PROD007</span>
+                        <span><i class="bi bi-clock"></i> Hace 5 horas</span>
+                    </div>
+                </div>
+                <div class="alert-actions">
+                    <a href="/productos/7/editar" class="btn-modern btn-primary">
+                        <i class="bi bi-pencil"></i> Ver Producto
+                    </a>
+                    <button class="btn-modern btn-secondary" onclick="marcarLeida(this)">
+                        <i class="bi bi-check"></i>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Alerta MEDIA ejemplo -->
+            <div class="alert-item media" data-prioridad="media">
+                <div class="alert-icon">
+                    <i class="bi bi-info-circle"></i>
+                </div>
+                <div class="alert-content">
+                    <div class="alert-title">
+                        <span>Vencimiento Próximo</span>
+                        <span class="badge badge-media">Media</span>
+                    </div>
+                    <div class="alert-message">
+                        El producto "Aceite Vegetal 1L" vencerá en 25 días (Fecha: 21/12/2025). Planifica su rotación.
+                    </div>
+                    <div class="alert-meta">
+                        <span><i class="bi bi-box-seam"></i> PROD005</span>
+                        <span><i class="bi bi-clock"></i> Hace 1 día</span>
+                    </div>
+                </div>
+                <div class="alert-actions">
+                    <a href="/productos/5/editar" class="btn-modern btn-primary">
+                        <i class="bi bi-pencil"></i> Ver Producto
+                    </a>
+                    <button class="btn-modern btn-secondary" onclick="marcarLeida(this)">
+                        <i class="bi bi-check"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Estado vacío -->
+        <div id="emptyState" class="empty-state" style="display: none;">
+            <i class="bi bi-check-circle-fill text-success"></i>
+            <h4>¡Todo en orden!</h4>
+            <p style="color: var(--gray);">No tienes alertas pendientes en este momento</p>
+        </div>
+    </div>
+
+    <script>
+        // Filtrado de alertas
+        document.querySelectorAll('.filter-tab').forEach(tab => {
+            tab.addEventListener('click', function() {
+                // Remover active de todos
+                document.querySelectorAll('.filter-tab').forEach(t => t.classList.remove('active'));
+                this.classList.add('active');
+                
+                const filter = this.dataset.filter;
+                const alertas = document.querySelectorAll('.alert-item');
+                
+                alertas.forEach(alerta => {
+                    if (filter === 'todas' || alerta.dataset.prioridad === filter) {
+                        alerta.style.display = 'flex';
+                    } else {
+                        alerta.style.display = 'none';
+                    }
+                });
+            });
+        });
+
+        // Marcar como leída
+        function marcarLeida(btn) {
+            const alertaItem = btn.closest('.alert-item');
+            alertaItem.style.opacity = '0.5';
+            alertaItem.style.transform = 'scale(0.95)';
+            
+            setTimeout(() => {
+                alertaItem.remove();
+                actualizarContadores();
+                verificarVacio();
+            }, 300);
+        }
+
+        // Marcar todas como leídas
+        function marcarTodasLeidas() {
+            if (confirm('¿Marcar todas las alertas como leídas?')) {
+                const alertas = document.querySelectorAll('.alert-item');
+                alertas.forEach((alerta, index) => {
+                    setTimeout(() => {
+                        alerta.style.opacity = '0';
+                        alerta.style.transform = 'scale(0.95)';
+                        setTimeout(() => {
+                            alerta.remove();
+                            if (index === alertas.length - 1) {
+                                actualizarContadores();
+                                verificarVacio();
+                            }
+                        }, 300);
+                    }, index * 100);
+                });
+            }
+        }
+
+        // Actualizar contadores
+        function actualizarContadores() {
+            const todas = document.querySelectorAll('.alert-item').length;
+            const criticas = document.querySelectorAll('.alert-item[data-prioridad="critica"]').length;
+            const altas = document.querySelectorAll('.alert-item[data-prioridad="alta"]').length;
+            const medias = document.querySelectorAll('.alert-item[data-prioridad="media"]').length;
+            
+            document.getElementById('count-todas').textContent = todas;
+            document.getElementById('count-critica').textContent = criticas;
+            document.getElementById('count-alta').textContent = altas;
+            document.getElementById('count-media').textContent = medias;
+        }
+
+        // Verificar si está vacío
+        function verificarVacio() {
+            const alertas = document.querySelectorAll('.alert-item');
+            const container = document.getElementById('alertasContainer');
+            const empty = document.getElementById('emptyState');
+            
+            if (alertas.length === 0) {
+                container.style.display = 'none';
+                empty.style.display = 'block';
+            }
+        }
+
+        // Inicializar contadores
+        actualizarContadores();
+    </script>
+</body>
+</html>

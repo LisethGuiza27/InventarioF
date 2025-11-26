@@ -3,188 +3,492 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Formulario Producto</title>
+    <title>Formulario Producto - Sistema de Inventario</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <style>
+        :root {
+            --primary: #4f46e5;
+            --primary-dark: #4338ca;
+            --success: #10b981;
+            --danger: #ef4444;
+            --dark: #0f172a;
+            --gray: #64748b;
+            --gray-light: #f1f5f9;
+            --white: #ffffff;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
         body {
+            font-family: 'Inter', sans-serif;
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             min-height: 100vh;
-            padding: 20px 0;
+            padding: 30px 0;
         }
+
+        .sidebar {
+            position: fixed;
+            left: 0;
+            top: 0;
+            width: 260px;
+            height: 100vh;
+            background: var(--dark);
+            padding: 20px 0;
+            overflow-y: auto;
+            z-index: 1000;
+        }
+
+        .sidebar-logo {
+            padding: 0 25px 30px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            margin-bottom: 20px;
+        }
+
+        .sidebar-logo h1 {
+            color: var(--white);
+            font-size: 24px;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .sidebar-menu {
+            padding: 0 15px;
+        }
+
+        .menu-item {
+            display: block;
+            padding: 12px 20px;
+            color: rgba(255, 255, 255, 0.7);
+            text-decoration: none;
+            border-radius: 8px;
+            margin-bottom: 5px;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-weight: 500;
+        }
+
+        .menu-item:hover {
+            background: rgba(255, 255, 255, 0.1);
+            color: var(--white);
+        }
+
+        .menu-item.active {
+            background: var(--primary);
+            color: var(--white);
+        }
+
+        .main-content {
+            margin-left: 260px;
+            padding: 30px;
+        }
+
         .form-card {
-            background: white;
-            border-radius: 15px;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+            background: var(--white);
+            border-radius: 16px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            overflow: hidden;
+            animation: slideIn 0.4s ease;
+        }
+
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .form-header {
+            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+            color: white;
+            padding: 30px;
+        }
+
+        .form-header h2 {
+            margin: 0;
+            font-size: 28px;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .form-body {
+            padding: 40px;
+        }
+
+        .section-title {
+            font-size: 18px;
+            font-weight: 600;
+            color: var(--primary);
+            margin: 30px 0 20px 0;
+            padding-bottom: 10px;
+            border-bottom: 2px solid var(--gray-light);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .section-title:first-child {
+            margin-top: 0;
+        }
+
+        .form-label {
+            font-size: 14px;
+            font-weight: 600;
+            color: var(--dark);
+            margin-bottom: 8px;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .required {
+            color: var(--danger);
+        }
+
+        .form-control, .form-select {
+            padding: 12px 16px;
+            border: 2px solid #e2e8f0;
+            border-radius: 10px;
+            font-size: 15px;
+            transition: all 0.3s;
+        }
+
+        .form-control:focus, .form-select:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 4px rgba(79, 70, 229, 0.1);
+        }
+
+        .input-group-text {
+            background: var(--gray-light);
+            border: 2px solid #e2e8f0;
+            border-right: none;
+            border-radius: 10px 0 0 10px;
+            font-weight: 600;
+            color: var(--gray);
+        }
+
+        .input-group .form-control {
+            border-left: none;
+            border-radius: 0 10px 10px 0;
+        }
+
+        .form-check-input {
+            width: 24px;
+            height: 24px;
+            border: 2px solid #e2e8f0;
+            border-radius: 6px;
+            cursor: pointer;
+        }
+
+        .form-check-input:checked {
+            background-color: var(--primary);
+            border-color: var(--primary);
+        }
+
+        .form-check-label {
+            margin-left: 10px;
+            font-weight: 500;
+            cursor: pointer;
+        }
+
+        .btn-modern {
+            padding: 14px 28px;
+            border-radius: 10px;
+            font-weight: 600;
+            border: none;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            text-decoration: none;
+            font-size: 15px;
+        }
+
+        .btn-primary {
+            background: var(--primary);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: var(--primary-dark);
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(79, 70, 229, 0.3);
+        }
+
+        .btn-secondary {
+            background: var(--gray);
+            color: white;
+        }
+
+        .btn-secondary:hover {
+            background: #475569;
+            transform: translateY(-2px);
+        }
+
+        .form-actions {
+            display: flex;
+            gap: 15px;
+            justify-content: flex-end;
+            padding-top: 30px;
+            border-top: 2px solid var(--gray-light);
+            margin-top: 30px;
+        }
+
+        .form-hint {
+            font-size: 13px;
+            color: var(--gray);
+            margin-top: 5px;
         }
     </style>
 </head>
 <body>
-    <div class="container mt-4">
-        <div class="row justify-content-center">
-            <div class="col-lg-10">
-                <div class="form-card">
-                    <div class="card-header bg-primary text-white p-4">
-                        <h4 class="mb-0">
-                            <i class="bi bi-pencil-square"></i>
-                            <span th:if="${producto.id == null}">Nuevo Producto</span>
-                            <span th:if="${producto.id != null}">Editar Producto</span>
-                        </h4>
+    <!-- Sidebar -->
+    <nav class="sidebar">
+        <div class="sidebar-logo">
+            <h1><i class="bi bi-boxes"></i> InventaPro</h1>
+        </div>
+        <div class="sidebar-menu">
+            <a href="/dashboard" class="menu-item">
+                <i class="bi bi-speedometer2"></i> Dashboard
+            </a>
+            <a href="/productos" class="menu-item active">
+                <i class="bi bi-box-seam"></i> Productos
+            </a>
+            <a href="/movimientos" class="menu-item">
+                <i class="bi bi-arrow-left-right"></i> Movimientos
+            </a>
+            <a href="/almacenes" class="menu-item">
+                <i class="bi bi-building"></i> Almacenes
+            </a>
+            <a href="/proveedores" class="menu-item">
+                <i class="bi bi-truck"></i> Proveedores
+            </a>
+            <a href="/clientes" class="menu-item">
+                <i class="bi bi-people"></i> Clientes
+            </a>
+            <a href="/reportes" class="menu-item">
+                <i class="bi bi-graph-up"></i> Reportes
+            </a>
+            <a href="/usuarios" class="menu-item">
+                <i class="bi bi-person-gear"></i> Usuarios
+            </a>
+            <a href="/logout" class="menu-item">
+                <i class="bi bi-box-arrow-right"></i> Cerrar Sesión
+            </a>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <div class="main-content">
+        <div class="form-card">
+            <div class="form-header">
+                <h2>
+                    <i class="bi bi-pencil-square"></i>
+                    <span th:if="${producto.id == null}">Nuevo Producto</span>
+                    <span th:if="${producto.id != null}">Editar Producto</span>
+                </h2>
+            </div>
+
+            <div class="form-body">
+                <form th:action="@{${producto.id != null ? '/productos/' + producto.id : '/productos'}}" 
+                      th:object="${producto}" method="post" id="productoForm">
+                    <input type="hidden" th:field="*{id}">
+
+                    <!-- Información Básica -->
+                    <div class="section-title">
+                        <i class="bi bi-info-circle"></i> Información Básica
                     </div>
-                    <div class="card-body p-4">
-                        <form th:action="@{${producto.id != null ? '/productos/' + producto.id : '/productos'}}" 
-                              th:object="${producto}" method="post">
-                            <input type="hidden" th:field="*{id}">
+                    
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label for="codigo" class="form-label">
+                                Código <span class="required">*</span>
+                            </label>
+                            <input type="text" class="form-control" id="codigo" 
+                                   th:field="*{codigo}" placeholder="Ej: PROD001" required
+                                   maxlength="50">
+                            <div class="form-hint">Código único del producto</div>
+                        </div>
 
-                            <h5 class="text-primary mb-3">
-                                <i class="bi bi-info-circle"></i> Información Básica
-                            </h5>
-                            
-                            <div class="row">
-                                <div class="col-md-6 mb-3">
-                                    <label for="codigo" class="form-label">Código: *</label>
-                                    <input type="text" class="form-control" id="codigo" 
-                                           th:field="*{codigo}" placeholder="Ej: PROD001" required>
-                                </div>
-
-                                <div class="col-md-6 mb-3">
-                                    <label for="nombre" class="form-label">Nombre: *</label>
-                                    <input type="text" class="form-control" id="nombre" 
-                                           th:field="*{nombre}" placeholder="Nombre del producto" required>
-                                </div>
-                            </div>
-
-                            <div class="mb-3">
-                                <label for="descripcion" class="form-label">Descripción:</label>
-                                <textarea class="form-control" id="descripcion" th:field="*{descripcion}" 
-                                          rows="3" placeholder="Descripción detallada"></textarea>
-                            </div>
-
-                            <div class="row">
-                                <div class="col-md-6 mb-3">
-                                    <label for="categoriaId" class="form-label">Categoría:</label>
-                                    <select class="form-select" id="categoriaId" name="categoriaId">
-                                        <option value="">-- Seleccione --</option>
-                                        <option th:each="cat : ${categorias}" th:value="${cat.id}" 
-                                                th:text="${cat.nombre}"
-                                                th:selected="${producto.categoria != null && producto.categoria.id == cat.id}">
-                                        </option>
-                                    </select>
-                                </div>
-
-                                <div class="col-md-6 mb-3">
-                                    <label for="proveedorId" class="form-label">Proveedor:</label>
-                                    <select class="form-select" id="proveedorId" name="proveedorId">
-                                        <option value="">-- Seleccione --</option>
-                                        <option th:each="prov : ${proveedores}" th:value="${prov.id}" 
-                                                th:text="${prov.nombre}"
-                                                th:selected="${producto.proveedor != null && producto.proveedor.id == prov.id}">
-                                        </option>
-                                    </select>
-                                </div>
-                            </div>
-
-                            <hr class="my-4">
-
-                            <h5 class="text-primary mb-3">
-                                <i class="bi bi-currency-dollar"></i> Precios
-                            </h5>
-
-                            <div class="row">
-                                <div class="col-md-4 mb-3">
-                                    <label for="precioVenta" class="form-label">Precio Venta: *</label>
-                                    <div class="input-group">
-                                        <span class="input-group-text">$</span>
-                                        <input type="number" class="form-control" id="precioVenta" 
-                                               th:field="*{precioVenta}" step="0.01" min="0" required>
-                                    </div>
-                                </div>
-
-                                <div class="col-md-4 mb-3">
-                                    <label for="precioCompra" class="form-label">Precio Compra:</label>
-                                    <div class="input-group">
-                                        <span class="input-group-text">$</span>
-                                        <input type="number" class="form-control" id="precioCompra" 
-                                               th:field="*{precioCompra}" step="0.01" min="0">
-                                    </div>
-                                </div>
-
-                                <div class="col-md-4 mb-3">
-                                    <label for="precioMayoreo" class="form-label">Precio Mayoreo:</label>
-                                    <div class="input-group">
-                                        <span class="input-group-text">$</span>
-                                        <input type="number" class="form-control" id="precioMayoreo" 
-                                               th:field="*{precioMayoreo}" step="0.01" min="0">
-                                    </div>
-                                </div>
-                            </div>
-
-                            <hr class="my-4">
-
-                            <h5 class="text-primary mb-3">
-                                <i class="bi bi-boxes"></i> Inventario
-                            </h5>
-
-                            <div class="row">
-                                <div class="col-md-3 mb-3">
-                                    <label for="stockActual" class="form-label">Stock Actual: *</label>
-                                    <input type="number" class="form-control" id="stockActual" 
-                                           th:field="*{stockActual}" min="0" required>
-                                </div>
-
-                                <div class="col-md-3 mb-3">
-                                    <label for="stockMinimo" class="form-label">Stock Mínimo:</label>
-                                    <input type="number" class="form-control" id="stockMinimo" 
-                                           th:field="*{stockMinimo}" min="0">
-                                </div>
-
-                                <div class="col-md-3 mb-3">
-                                    <label for="stockMaximo" class="form-label">Stock Máximo:</label>
-                                    <input type="number" class="form-control" id="stockMaximo" 
-                                           th:field="*{stockMaximo}" min="0">
-                                </div>
-
-                                <div class="col-md-3 mb-3">
-                                    <label for="unidadMedida" class="form-label">Unidad:</label>
-                                    <select class="form-select" id="unidadMedida" th:field="*{unidadMedida}">
-                                        <option value="UND">Unidad</option>
-                                        <option value="KG">Kilogramo</option>
-                                        <option value="LT">Litro</option>
-                                        <option value="MT">Metro</option>
-                                        <option value="CAJA">Caja</option>
-                                    </select>
-                                </div>
-                            </div>
-
-                            <div class="row mt-3">
-                                <div class="col-md-4">
-                                    <div class="form-check form-switch">
-                                        <input type="checkbox" class="form-check-input" id="activo" 
-                                               th:field="*{activo}">
-                                        <label class="form-check-label" for="activo">
-                                            <strong>Producto Activo</strong>
-                                        </label>
-                                    </div>
-                                </div>
-                            </div>
-
-                            <hr class="my-4">
-
-                            <div class="d-flex justify-content-end gap-2">
-                                <a href="/productos" class="btn btn-secondary">
-                                    <i class="bi bi-x-circle"></i> Cancelar
-                                </a>
-                                <button type="submit" class="btn btn-primary">
-                                    <i class="bi bi-save"></i> Guardar
-                                </button>
-                            </div>
-                        </form>
+                        <div class="col-md-6 mb-3">
+                            <label for="nombre" class="form-label">
+                                Nombre <span class="required">*</span>
+                            </label>
+                            <input type="text" class="form-control" id="nombre" 
+                                   th:field="*{nombre}" placeholder="Nombre del producto" required
+                                   maxlength="200">
+                        </div>
                     </div>
-                </div>
+
+                    <div class="mb-3">
+                        <label for="descripcion" class="form-label">Descripción</label>
+                        <textarea class="form-control" id="descripcion" th:field="*{descripcion}" 
+                                  rows="3" placeholder="Descripción detallada del producto"
+                                  maxlength="500"></textarea>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-4 mb-3">
+                            <label for="categoria" class="form-label">Categoría</label>
+                            <select class="form-select" id="categoria" th:field="*{categoria.id}">
+                                <option value="">-- Seleccione --</option>
+                                <option th:each="cat : ${categorias}" 
+                                        th:value="${cat.id}" 
+                                        th:text="${cat.nombre}">
+                                </option>
+                            </select>
+                        </div>
+
+                        <div class="col-md-4 mb-3">
+                            <label for="proveedor" class="form-label">Proveedor</label>
+                            <select class="form-select" id="proveedor" th:field="*{proveedor.id}">
+                                <option value="">-- Seleccione --</option>
+                                <option th:each="prov : ${proveedores}" 
+                                        th:value="${prov.id}" 
+                                        th:text="${prov.nombre}">
+                                </option>
+                            </select>
+                        </div>
+
+                        <div class="col-md-4 mb-3">
+                            <label for="unidadMedida" class="form-label">Unidad de Medida</label>
+                            <select class="form-select" id="unidadMedida" th:field="*{unidadMedida}">
+                                <option value="UND">Unidad</option>
+                                <option value="KG">Kilogramo</option>
+                                <option value="LT">Litro</option>
+                                <option value="MT">Metro</option>
+                                <option value="CAJA">Caja</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <!-- Precios -->
+                    <div class="section-title">
+                        <i class="bi bi-currency-dollar"></i> Precios
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-4 mb-3">
+                            <label for="precioVenta" class="form-label">
+                                Precio Venta <span class="required">*</span>
+                            </label>
+                            <div class="input-group">
+                                <span class="input-group-text">$</span>
+                                <input type="number" class="form-control" id="precioVenta" 
+                                       th:field="*{precioVenta}" step="0.01" min="0" required>
+                            </div>
+                        </div>
+
+                        <div class="col-md-4 mb-3">
+                            <label for="precioCompra" class="form-label">Precio Compra</label>
+                            <div class="input-group">
+                                <span class="input-group-text">$</span>
+                                <input type="number" class="form-control" id="precioCompra" 
+                                       th:field="*{precioCompra}" step="0.01" min="0">
+                            </div>
+                        </div>
+
+                        <div class="col-md-4 mb-3">
+                            <label for="precioMayoreo" class="form-label">Precio Mayoreo</label>
+                            <div class="input-group">
+                                <span class="input-group-text">$</span>
+                                <input type="number" class="form-control" id="precioMayoreo" 
+                                       th:field="*{precioMayoreo}" step="0.01" min="0">
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Inventario -->
+                    <div class="section-title">
+                        <i class="bi bi-boxes"></i> Control de Inventario
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-3 mb-3">
+                            <label for="stockActual" class="form-label">
+                                Stock Actual <span class="required">*</span>
+                            </label>
+                            <input type="number" class="form-control" id="stockActual" 
+                                   th:field="*{stockActual}" min="0" required>
+                        </div>
+
+                        <div class="col-md-3 mb-3">
+                            <label for="stockMinimo" class="form-label">Stock Mínimo</label>
+                            <input type="number" class="form-control" id="stockMinimo" 
+                                   th:field="*{stockMinimo}" min="0">
+                            <div class="form-hint">Alerta de stock bajo</div>
+                        </div>
+
+                        <div class="col-md-3 mb-3">
+                            <label for="stockMaximo" class="form-label">Stock Máximo</label>
+                            <input type="number" class="form-control" id="stockMaximo" 
+                                   th:field="*{stockMaximo}" min="0">
+                        </div>
+
+                        <div class="col-md-3 mb-3">
+                            <label for="puntoReorden" class="form-label">Punto de Reorden</label>
+                            <input type="number" class="form-control" id="puntoReorden" 
+                                   th:field="*{puntoReorden}" min="0">
+                        </div>
+                    </div>
+
+                    <!-- Estado -->
+                    <div class="section-title">
+                        <i class="bi bi-toggle-on"></i> Estado
+                    </div>
+
+                    <div class="form-check">
+                        <input type="checkbox" class="form-check-input" id="activo" 
+                               th:field="*{activo}">
+                        <label class="form-check-label" for="activo">
+                            <strong>Producto Activo</strong>
+                            <div class="form-hint">Los productos inactivos no aparecen en movimientos</div>
+                        </label>
+                    </div>
+
+                    <!-- Acciones -->
+                    <div class="form-actions">
+                        <a href="/productos" class="btn-modern btn-secondary">
+                            <i class="bi bi-x-circle"></i> Cancelar
+                        </a>
+                        <button type="submit" class="btn-modern btn-primary">
+                            <i class="bi bi-save"></i> Guardar Producto
+                        </button>
+                    </div>
+                </form>
             </div>
         </div>
     </div>
 
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        // Validación del formulario
+        document.getElementById('productoForm').addEventListener('submit', function(e) {
+            const precioVenta = parseFloat(document.getElementById('precioVenta').value);
+            const precioCompra = parseFloat(document.getElementById('precioCompra').value);
+            
+            if (precioCompra && precioVenta < precioCompra) {
+                if (!confirm('El precio de venta es menor que el precio de compra. ¿Desea continuar?')) {
+                    e.preventDefault();
+                }
+            }
+        });
+    </script>
 </body>
 </html>
