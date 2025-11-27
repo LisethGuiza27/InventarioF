@@ -31,8 +31,17 @@
                     <td th:text="${a.ciudad}"></td>
                     <td th:text="${a.usuarioResponsable?.nombreCompleto}"></td>
                     <td>
-                        <a th:href="@{/almacenes/{id}/editar(id=${a.id})}" class="btn btn-sm btn-primary">Editar</a>
-                        <a th:href="@{/almacenes/{id}/inventario(id=${a.id})}" class="btn btn-sm btn-info">Inventario</a>
+                        <a th:href="@{/almacenes/{id}/editar(id=${a.id})}" class="btn btn-sm btn-primary">
+                            <i class="bi bi-pencil"></i> Editar
+                        </a>
+                        <a th:href="@{/almacenes/{id}/inventario(id=${a.id})}" class="btn btn-sm btn-info">
+                            <i class="bi bi-box-seam"></i> Inventario
+                        </a>
+                        <a th:href="@{/almacenes/{id}/eliminar(id=${a.id})}" 
+                           class="btn btn-sm btn-warning"
+                           onclick="return confirm('¿Desea desactivar este almacén?')">
+                            <i class="bi bi-toggle-off"></i> Desactivar
+                        </a>
                     </td>
                 </tr>
             </tbody>

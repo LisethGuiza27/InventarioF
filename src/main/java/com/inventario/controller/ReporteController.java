@@ -1,5 +1,6 @@
 package com.inventario.controller;
 
+import com.inventario.model.Producto;
 import com.inventario.service.ReporteService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.format.annotation.DateTimeFormat;
@@ -8,6 +9,8 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDate;
+import java.util.List;
+import java.util.Map;
 
 @Controller
 @RequestMapping("/reportes")
@@ -82,4 +85,47 @@ public class ReporteController {
             return "reportes/kardex";
         }
     }
+    @GetMapping("/proximos-vencer")
+    public String reporteProximosVencer(@RequestParam(defaultValue = "30") int dias, Model model) {
+        try {
+            List<Producto> productos = service.reporteProductosProximosVencer(dias);
+            model.addAttribute("productos", productos);
+            model.addAttribute("dias", dias);
+            return "reportes/proximos-vencer";
+        } catch (Exception e) {
+            model.addAttribute("error", "Error al generar reporte: " + e.getMessage());
+            return "reportes/proximos-vencer";
+        }
+    }
+
+    @GetMapping("/mas-vendidos")
+    public String reporteMasVendidos(@RequestParam(defaultValue = "10") int top, Model model) {
+        try {
+            List<Map<String, Object>> productos = service.reporteProductosMasVendidos(top);
+            model.addAttribute("productos", productos);
+            model.addAttribute("top", top);
+            return "reportes/mas-vendidos";
+        } catch (Exception e) {
+            model.addAttribute("error", "Error al generar reporte: " + e.getMessage());
+            return "reportes/mas-vendidos";
+        }
+    }
+
+    @GetMapping("/rotacion")
+    public String reporteRotacion(
+            @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate desde,
+            @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate hasta,
+            Model model) {
+        try {
+            Map<String, Object> reporte = service.reporteRotacion(desde, hasta);
+            model.addAttribute("reporte", reporte);
+            model.addAttribute("desde", desde);
+            model.addAttribute("hasta", hasta);
+            return "reportes/rotacion";
+        } catch (Exception e) {
+            model.addAttribute("error", "Error al generar reporte: " + e.getMessage());
+            return "reportes/rotacion";
+        }
+    }
+    
 }

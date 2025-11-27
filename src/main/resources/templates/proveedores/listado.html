@@ -34,8 +34,17 @@
                     <td th:text="${p.telefono}"></td>
                     <td th:text="${p.email}"></td>
                     <td>
-                        <a th:href="@{/proveedores/{id}/editar(id=${p.id})}" class="btn btn-sm btn-primary">Editar</a>
-                        <a th:href="@{/proveedores/{id}/detalle(id=${p.id})}" class="btn btn-sm btn-info">Ver</a>
+                        <a th:href="@{/proveedores/{id}/editar(id=${p.id})}" class="btn btn-sm btn-primary">
+                            <i class="bi bi-pencil"></i> Editar
+                        </a>
+                        <a th:href="@{/proveedores/{id}/detalle(id=${p.id})}" class="btn btn-sm btn-info">
+                            <i class="bi bi-eye"></i> Ver
+                        </a>
+                        <a th:href="@{/proveedores/{id}/eliminar(id=${p.id})}" 
+                           class="btn btn-sm btn-danger"
+                           onclick="return confirm('¿Desea desactivar este proveedor?')">
+                            <i class="bi bi-trash"></i> Desactivar
+                        </a>
                     </td>
                 </tr>
             </tbody>

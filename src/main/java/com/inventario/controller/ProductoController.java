@@ -60,64 +60,69 @@ public class ProductoController {
 
     // POST - Crear producto
     @PostMapping
-    public String crear(@Valid @ModelAttribute("producto") Producto producto, 
-                       BindingResult result,
-                       Model model,
-                       RedirectAttributes redirect) {
+public String crear(@Valid @ModelAttribute("producto") Producto producto, 
+                   BindingResult result,
+                   @RequestParam(value = "categoriaId", required = false) Integer categoriaId,
+                   @RequestParam(value = "proveedorId", required = false) Integer proveedorId,
+                   Model model,
+                   RedirectAttributes redirect) {
+    
+    System.out.println("=== CREAR PRODUCTO ===");
+    System.out.println("Código: " + producto.getCodigo());
+    System.out.println("Nombre: " + producto.getNombre());
+    System.out.println("Precio: " + producto.getPrecioVenta());
+    System.out.println("CategoriaId: " + categoriaId);
+    System.out.println("ProveedorId: " + proveedorId);
+    
+    if (result.hasErrors()) {
+        System.out.println("Errores de validación:");
+        result.getAllErrors().forEach(error -> 
+            System.out.println("- " + error.getDefaultMessage())
+        );
         
-        // Log para debug
-        System.out.println("=== CREAR PRODUCTO ===");
-        System.out.println("Código: " + producto.getCodigo());
-        System.out.println("Nombre: " + producto.getNombre());
-        System.out.println("Precio: " + producto.getPrecioVenta());
-        
-        // Si hay errores de validación
-        if (result.hasErrors()) {
-            System.out.println("Errores de validación:");
-            result.getAllErrors().forEach(error -> 
-                System.out.println("- " + error.getDefaultMessage())
-            );
-            
-            model.addAttribute("categorias", categoriaService.listarActivos());
-            model.addAttribute("proveedores", proveedorService.listarActivos());
-            return "productos/formulario";
-        }
-        
-        try {
-            // Validaciones adicionales
-            if (producto.getStockActual() == null) {
-                producto.setStockActual(0);
-            }
-            if (producto.getStockMinimo() == null) {
-                producto.setStockMinimo(0);
-            }
-            if (producto.getActivo() == null) {
-                producto.setActivo(true);
-            }
-            
-            // Guardar el producto
-            Producto productoGuardado = productoService.crear(producto);
-            
-            System.out.println("Producto guardado exitosamente con ID: " + productoGuardado.getId());
-            
-            redirect.addFlashAttribute("mensaje", "Producto creado exitosamente");
-            redirect.addFlashAttribute("tipo", "success");
-            
-            return "redirect:/productos";
-            
-        } catch (Exception e) {
-            e.printStackTrace();
-            System.err.println("Error al guardar producto: " + e.getMessage());
-            
-            redirect.addFlashAttribute("mensaje", "Error al crear producto: " + e.getMessage());
-            redirect.addFlashAttribute("tipo", "error");
-            
-            model.addAttribute("categorias", categoriaService.listarActivos());
-            model.addAttribute("proveedores", proveedorService.listarActivos());
-            
-            return "productos/formulario";
-        }
+        model.addAttribute("categorias", categoriaService.listarActivos());
+        model.addAttribute("proveedores", proveedorService.listarActivos());
+        return "productos/formulario";
     }
+    
+    try {
+        // Asignar categoría si existe
+        if (categoriaId != null && categoriaId > 0) {
+            categoriaService.obtenerPorId(categoriaId).ifPresent(producto::setCategoria);
+        }
+        
+        // Asignar proveedor si existe
+        if (proveedorId != null && proveedorId > 0) {
+            proveedorService.obtenerPorId(proveedorId).ifPresent(producto::setProveedor);
+        }
+        
+        // Inicializar valores por defecto
+        if (producto.getStockActual() == null) producto.setStockActual(0);
+        if (producto.getStockMinimo() == null) producto.setStockMinimo(0);
+        if (producto.getActivo() == null) producto.setActivo(true);
+        
+        Producto productoGuardado = productoService.crear(producto);
+        
+        System.out.println("Producto guardado exitosamente con ID: " + productoGuardado.getId());
+        
+        redirect.addFlashAttribute("mensaje", "Producto creado exitosamente");
+        redirect.addFlashAttribute("tipo", "success");
+        
+        return "redirect:/productos";
+        
+    } catch (Exception e) {
+        e.printStackTrace();
+        System.err.println("Error al guardar producto: " + e.getMessage());
+        
+        redirect.addFlashAttribute("mensaje", "Error al crear producto: " + e.getMessage());
+        redirect.addFlashAttribute("tipo", "error");
+        
+        model.addAttribute("categorias", categoriaService.listarActivos());
+        model.addAttribute("proveedores", proveedorService.listarActivos());
+        
+        return "productos/formulario";
+    }
+}
 
     // GET - Formulario editar
     @GetMapping("/{id}/editar")
@@ -147,45 +152,49 @@ public class ProductoController {
 
     // POST - Actualizar producto
     @PostMapping("/{id}")
-    public String actualizar(@PathVariable Integer id,
-                            @Valid @ModelAttribute("producto") Producto producto,
-                            BindingResult result,
-                            Model model,
-                            RedirectAttributes redirect) {
-        
-        System.out.println("=== ACTUALIZAR PRODUCTO ===");
-        System.out.println("ID: " + id);
-        System.out.println("Código: " + producto.getCodigo());
-        
-        if (result.hasErrors()) {
-            model.addAttribute("categorias", categoriaService.listarActivos());
-            model.addAttribute("proveedores", proveedorService.listarActivos());
-            return "productos/formulario";
-        }
-        
-        try {
-            Producto productoActualizado = productoService.actualizar(id, producto);
-            
-            System.out.println("Producto actualizado exitosamente: " + productoActualizado.getId());
-            
-            redirect.addFlashAttribute("mensaje", "Producto actualizado exitosamente");
-            redirect.addFlashAttribute("tipo", "success");
-            
-            return "redirect:/productos";
-            
-        } catch (Exception e) {
-            e.printStackTrace();
-            System.err.println("Error al actualizar producto: " + e.getMessage());
-            
-            redirect.addFlashAttribute("mensaje", "Error al actualizar: " + e.getMessage());
-            redirect.addFlashAttribute("tipo", "error");
-            
-            model.addAttribute("categorias", categoriaService.listarActivos());
-            model.addAttribute("proveedores", proveedorService.listarActivos());
-            
-            return "productos/formulario";
-        }
+public String actualizar(@PathVariable Integer id,
+                        @Valid @ModelAttribute("producto") Producto producto,
+                        @RequestParam(value = "categoriaId", required = false) Integer categoriaId,
+                        @RequestParam(value = "proveedorId", required = false) Integer proveedorId,
+                        BindingResult result,
+                        Model model,
+                        RedirectAttributes redirect) {
+    
+    if (result.hasErrors()) {
+        model.addAttribute("categorias", categoriaService.listarActivos());
+        model.addAttribute("proveedores", proveedorService.listarActivos());
+        return "productos/formulario";
     }
+    
+    try {
+        // Asignar categoría si existe
+        if (categoriaId != null && categoriaId > 0) {
+            categoriaService.obtenerPorId(categoriaId).ifPresent(producto::setCategoria);
+        }
+        
+        // Asignar proveedor si existe
+        if (proveedorId != null && proveedorId > 0) {
+            proveedorService.obtenerPorId(proveedorId).ifPresent(producto::setProveedor);
+        }
+        
+        Producto productoActualizado = productoService.actualizar(id, producto);
+        
+        redirect.addFlashAttribute("mensaje", "Producto actualizado exitosamente");
+        redirect.addFlashAttribute("tipo", "success");
+        
+        return "redirect:/productos";
+        
+    } catch (Exception e) {
+        e.printStackTrace();
+        redirect.addFlashAttribute("mensaje", "Error al actualizar: " + e.getMessage());
+        redirect.addFlashAttribute("tipo", "error");
+        
+        model.addAttribute("categorias", categoriaService.listarActivos());
+        model.addAttribute("proveedores", proveedorService.listarActivos());
+        
+        return "productos/formulario";
+    }
+}
 
     // GET - Eliminar producto (soft delete)
     @GetMapping("/{id}/eliminar")
