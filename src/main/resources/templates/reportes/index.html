@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="es">
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -20,11 +20,7 @@
             --white: #ffffff;
         }
 
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
 
         body {
             font-family: 'Inter', sans-serif;
@@ -59,9 +55,7 @@
             gap: 10px;
         }
 
-        .sidebar-menu {
-            padding: 0 15px;
-        }
+        .sidebar-menu { padding: 0 15px; }
 
         .menu-item {
             display: block;
@@ -125,25 +119,11 @@
             height: 4px;
         }
 
-        .report-card.primary::before {
-            background: var(--primary);
-        }
-
-        .report-card.success::before {
-            background: var(--success);
-        }
-
-        .report-card.warning::before {
-            background: var(--warning);
-        }
-
-        .report-card.danger::before {
-            background: var(--danger);
-        }
-
-        .report-card.info::before {
-            background: var(--info);
-        }
+        .report-card.primary::before { background: var(--primary); }
+        .report-card.success::before { background: var(--success); }
+        .report-card.warning::before { background: var(--warning); }
+        .report-card.danger::before { background: var(--danger); }
+        .report-card.info::before { background: var(--info); }
 
         .report-card:hover {
             transform: translateY(-5px);
@@ -161,30 +141,11 @@
             margin-bottom: 20px;
         }
 
-        .report-card.primary .report-icon {
-            background: rgba(79, 70, 229, 0.1);
-            color: var(--primary);
-        }
-
-        .report-card.success .report-icon {
-            background: rgba(16, 185, 129, 0.1);
-            color: var(--success);
-        }
-
-        .report-card.warning .report-icon {
-            background: rgba(245, 158, 11, 0.1);
-            color: var(--warning);
-        }
-
-        .report-card.danger .report-icon {
-            background: rgba(239, 68, 68, 0.1);
-            color: var(--danger);
-        }
-
-        .report-card.info .report-icon {
-            background: rgba(6, 182, 212, 0.1);
-            color: var(--info);
-        }
+        .report-card.primary .report-icon { background: rgba(79, 70, 229, 0.1); color: var(--primary); }
+        .report-card.success .report-icon { background: rgba(16, 185, 129, 0.1); color: var(--success); }
+        .report-card.warning .report-icon { background: rgba(245, 158, 11, 0.1); color: var(--warning); }
+        .report-card.danger .report-icon { background: rgba(239, 68, 68, 0.1); color: var(--danger); }
+        .report-card.info .report-icon { background: rgba(6, 182, 212, 0.1); color: var(--info); }
 
         .report-card h3 {
             font-size: 20px;
@@ -291,9 +252,9 @@
                 </div>
                 <h3>Movimientos por Periodo</h3>
                 <p>Analiza todas las entradas, salidas y ajustes de inventario en un rango de fechas específico.</p>
-                <a href="#" class="btn-modern btn-primary" data-bs-toggle="modal" data-bs-target="#movimientosModal">
+                <button class="btn-modern btn-primary" onclick="abrirModalMovimientos()">
                     <i class="bi bi-calendar-range"></i> Seleccionar Fechas
-                </a>
+                </button>
             </div>
 
             <!-- Stock Bajo -->
@@ -332,30 +293,6 @@
                 </a>
             </div>
 
-            <!-- Kardex -->
-            <div class="report-card primary">
-                <div class="report-icon">
-                    <i class="bi bi-file-earmark-spreadsheet"></i>
-                </div>
-                <h3>Kardex por Producto</h3>
-                <p>Historial completo de movimientos de entrada y salida de un producto específico.</p>
-                <a href="#" class="btn-modern btn-primary" data-bs-toggle="modal" data-bs-target="#kardexModal">
-                    <i class="bi bi-search"></i> Buscar Producto
-                </a>
-            </div>
-
-            <!-- Rotación -->
-            <div class="report-card success">
-                <div class="report-icon">
-                    <i class="bi bi-arrow-repeat"></i>
-                </div>
-                <h3>Rotación de Inventario</h3>
-                <p>Analiza la velocidad de rotación de tus productos para optimizar el stock.</p>
-                <a href="#" class="btn-modern btn-primary" data-bs-toggle="modal" data-bs-target="#rotacionModal">
-                    <i class="bi bi-speedometer2"></i> Calcular Rotación
-                </a>
-            </div>
-
             <!-- Productos Más Vendidos -->
             <div class="report-card warning">
                 <div class="report-icon">
@@ -366,6 +303,18 @@
                 <a href="/reportes/mas-vendidos?top=10" class="btn-modern btn-primary">
                     <i class="bi bi-star"></i> Ver Ranking
                 </a>
+            </div>
+
+            <!-- Rotación -->
+            <div class="report-card success">
+                <div class="report-icon">
+                    <i class="bi bi-arrow-repeat"></i>
+                </div>
+                <h3>Rotación de Inventario</h3>
+                <p>Analiza la velocidad de rotación de tus productos para optimizar el stock.</p>
+                <button class="btn-modern btn-primary" onclick="abrirModalRotacion()">
+                    <i class="bi bi-speedometer2"></i> Calcular Rotación
+                </button>
             </div>
         </div>
     </div>
@@ -382,45 +331,16 @@
                     <div class="modal-body">
                         <div class="mb-3">
                             <label class="form-label">Fecha Desde</label>
-                            <input type="date" name="desde" class="form-control" required 
-                                   th:value="${#temporals.format(#temporals.createNow(), 'yyyy-MM-dd')}">
+                            <input type="date" name="desde" class="form-control" required id="fechaDesdeMovimientos">
                         </div>
                         <div class="mb-3">
                             <label class="form-label">Fecha Hasta</label>
-                            <input type="date" name="hasta" class="form-control" required
-                                   th:value="${#temporals.format(#temporals.createNow(), 'yyyy-MM-dd')}">
+                            <input type="date" name="hasta" class="form-control" required id="fechaHastaMovimientos">
                         </div>
                     </div>
                     <div class="modal-footer">
                         <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
                         <button type="submit" class="btn btn-primary">Generar Reporte</button>
-                    </div>
-                </form>
-            </div>
-        </div>
-    </div>
-
-    <!-- Modal Kardex -->
-    <div class="modal fade" id="kardexModal" tabindex="-1">
-        <div class="modal-dialog">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title">Kardex por Producto</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-                </div>
-                <form action="/reportes/kardex" method="get" id="kardexForm">
-                    <div class="modal-body">
-                        <div class="mb-3">
-                            <label class="form-label">Seleccionar Producto</label>
-                            <select name="productoId" class="form-select" required>
-                                <option value="">-- Seleccione un producto --</option>
-                                <!-- Se llenará dinámicamente -->
-                            </select>
-                        </div>
-                    </div>
-                    <div class="modal-footer">
-                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
-                        <button type="submit" class="btn btn-primary">Ver Kardex</button>
                     </div>
                 </form>
             </div>
@@ -439,11 +359,11 @@
                     <div class="modal-body">
                         <div class="mb-3">
                             <label class="form-label">Fecha Desde</label>
-                            <input type="date" name="desde" class="form-control" required>
+                            <input type="date" name="desde" class="form-control" required id="fechaDesdeRotacion">
                         </div>
                         <div class="mb-3">
                             <label class="form-label">Fecha Hasta</label>
-                            <input type="date" name="hasta" class="form-control" required>
+                            <input type="date" name="hasta" class="form-control" required id="fechaHastaRotacion">
                         </div>
                     </div>
                     <div class="modal-footer">
@@ -456,5 +376,40 @@
     </div>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        // Inicializar fechas por defecto
+        function inicializarFechas() {
+            const hoy = new Date().toISOString().split('T')[0];
+            const hace30Dias = new Date();
+            hace30Dias.setDate(hace30Dias.getDate() - 30);
+            const fechaDesde = hace30Dias.toISOString().split('T')[0];
+            
+            // Movimientos
+            document.getElementById('fechaDesdeMovimientos').value = fechaDesde;
+            document.getElementById('fechaHastaMovimientos').value = hoy;
+            
+            // Rotación
+            document.getElementById('fechaDesdeRotacion').value = fechaDesde;
+            document.getElementById('fechaHastaRotacion').value = hoy;
+        }
+
+        // Modales
+        let modalMovimientos;
+        let modalRotacion;
+
+        document.addEventListener('DOMContentLoaded', function() {
+            inicializarFechas();
+            modalMovimientos = new bootstrap.Modal(document.getElementById('movimientosModal'));
+            modalRotacion = new bootstrap.Modal(document.getElementById('rotacionModal'));
+        });
+
+        function abrirModalMovimientos() {
+            modalMovimientos.show();
+        }
+
+        function abrirModalRotacion() {
+            modalRotacion.show();
+        }
+    </script>
 </body>
 </html>

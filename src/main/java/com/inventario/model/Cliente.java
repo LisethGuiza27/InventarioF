@@ -26,6 +26,12 @@ public class Cliente {
     @Column(name = "nombre_comercial", length = 150)
     private String nombreComercial;
     
+    @Column(name = "tipo_documento", length = 20)
+    private String tipoDocumento;
+    
+    @Column(name = "numero_documento", length = 50)
+    private String numeroDocumento;
+    
     @Column(length = 20)
     private String rfc;
     
@@ -57,14 +63,20 @@ public class Cliente {
     @Column(name = "dias_credito")
     private Integer diasCredito = 0;
     
-    @Column(name = "limite_credito", precision = 15, scale = 2)
+    @Column(name = "limite_credito")
     private Double limiteCredito = 0.0;
-    
-    @Column(name = "saldo_actual", precision = 15, scale = 2)
+
+    @Column(name = "saldo_actual")
     private Double saldoActual = 0.0;
-    
-    @Column(name = "descuento_general", precision = 5, scale = 2)
+
+    @Column(name = "descuento_general")
     private Double descuentoGeneral = 0.0;
+
+    @Column(name = "saldo_pendiente")
+    private Double saldoPendiente = 0.0;
+    
+    @Column(name = "fecha_ultima_compra")
+    private LocalDateTime fechaUltimaCompra;
     
     @Column(columnDefinition = "TEXT")
     private String notas;
@@ -110,6 +122,12 @@ public class Cliente {
     public String getNombreComercial() { return nombreComercial; }
     public void setNombreComercial(String nombreComercial) { this.nombreComercial = nombreComercial; }
     
+    public String getTipoDocumento() { return tipoDocumento; }
+    public void setTipoDocumento(String tipoDocumento) { this.tipoDocumento = tipoDocumento; }
+    
+    public String getNumeroDocumento() { return numeroDocumento; }
+    public void setNumeroDocumento(String numeroDocumento) { this.numeroDocumento = numeroDocumento; }
+    
     public String getRfc() { return rfc; }
     public void setRfc(String rfc) { this.rfc = rfc; }
     
@@ -146,8 +164,14 @@ public class Cliente {
     public Double getSaldoActual() { return saldoActual; }
     public void setSaldoActual(Double saldoActual) { this.saldoActual = saldoActual; }
     
+    public Double getSaldoPendiente() { return saldoPendiente; }
+    public void setSaldoPendiente(Double saldoPendiente) { this.saldoPendiente = saldoPendiente; }
+    
     public Double getDescuentoGeneral() { return descuentoGeneral; }
     public void setDescuentoGeneral(Double descuentoGeneral) { this.descuentoGeneral = descuentoGeneral; }
+    
+    public LocalDateTime getFechaUltimaCompra() { return fechaUltimaCompra; }
+    public void setFechaUltimaCompra(LocalDateTime fechaUltimaCompra) { this.fechaUltimaCompra = fechaUltimaCompra; }
     
     public String getNotas() { return notas; }
     public void setNotas(String notas) { this.notas = notas; }

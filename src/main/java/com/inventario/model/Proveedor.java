@@ -67,10 +67,13 @@ public class Proveedor {
     @Column(name = "dias_credito")
     private Integer diasCredito = 0;
     
-    @Column(name = "limite_credito", precision = 15, scale = 2)
+    @Column(name = "limite_credito")
     private Double limiteCredito = 0.0;
     
-    @Column(precision = 1, scale = 0)
+    @Column(name = "saldo_pendiente")
+    private Double saldoPendiente = 0.0;
+    
+    @Column
     private Integer calificacion = 5;
     
     @Column(columnDefinition = "TEXT")
@@ -170,6 +173,9 @@ public class Proveedor {
     
     public Double getLimiteCredito() { return limiteCredito; }
     public void setLimiteCredito(Double limiteCredito) { this.limiteCredito = limiteCredito; }
+    
+    public Double getSaldoPendiente() { return saldoPendiente; }
+    public void setSaldoPendiente(Double saldoPendiente) { this.saldoPendiente = saldoPendiente; }
     
     public Integer getCalificacion() { return calificacion; }
     public void setCalificacion(Integer calificacion) { this.calificacion = calificacion; }

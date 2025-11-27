@@ -8,7 +8,6 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
 
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 import java.util.Arrays;
 
 @Component
@@ -40,7 +39,6 @@ public class DataInitializer implements CommandLineRunner {
 
     @Override
     public void run(String... args) throws Exception {
-        // Solo inicializar si la BD está vacía
         if (usuarioRepo.count() == 0) {
             System.out.println("=== Inicializando datos de prueba ===");
             
@@ -93,10 +91,12 @@ public class DataInitializer implements CommandLineRunner {
             catRopa.setColor("#f59e0b");
             categoriaRepo.save(catRopa);
             
-            // 4. Crear proveedores
-            Proveedor prov1 = new Proveedor("PROV001", "Tech Solutions S.A.", "3201234567", "ventas@techsol.com");
+            // 4. Crear proveedores - CORREGIDO
+            Proveedor prov1 = new Proveedor("PROV001", "Tech Solutions S.A.");
             prov1.setRazonSocial("Tech Solutions S.A.");
-            prov1.setRuc("900123456-7");
+            prov1.setRfc("900123456-7");
+            prov1.setTelefono("3201234567");
+            prov1.setEmail("ventas@techsol.com");
             prov1.setDireccion("Calle 100 #15-20");
             prov1.setCiudad("Bogotá");
             prov1.setPais("Colombia");
@@ -104,9 +104,11 @@ public class DataInitializer implements CommandLineRunner {
             prov1.setLimiteCredito(50000000.0);
             proveedorRepo.save(prov1);
             
-            Proveedor prov2 = new Proveedor("PROV002", "Distribuidora Nacional", "3109876543", "info@disnac.com");
+            Proveedor prov2 = new Proveedor("PROV002", "Distribuidora Nacional");
             prov2.setRazonSocial("Distribuidora Nacional S.A.S");
-            prov2.setRuc("900987654-3");
+            prov2.setRfc("900987654-3");
+            prov2.setTelefono("3109876543");
+            prov2.setEmail("info@disnac.com");
             prov2.setDireccion("Carrera 50 #30-45");
             prov2.setCiudad("Medellín");
             prov2.setPais("Colombia");
@@ -132,15 +134,18 @@ public class DataInitializer implements CommandLineRunner {
             almSecundario.setCapacidadMaxima(5000.0);
             almacenRepo.save(almSecundario);
             
-            // 6. Crear clientes
-            Cliente cliente1 = new Cliente("CLI001", "Empresa ABC S.A.S", "3151234567", "compras@abc.com");
-            cliente1.setTipoDocumento("NIT");
-            cliente1.setNumeroDocumento("800123456-9");
+            // 6. Crear clientes - CORREGIDO
+            Cliente cliente1 = new Cliente("CLI001", "Empresa ABC S.A.S");
+            cliente1.setTelefono("3151234567");
+            cliente1.setEmail("compras@abc.com");
+            cliente1.setRfc("800123456-9");
             cliente1.setDireccion("Carrera 7 #32-16");
             cliente1.setCiudad("Bogotá");
             cliente1.setPais("Colombia");
             cliente1.setDiasCredito(30);
             cliente1.setLimiteCredito(20000000.0);
+            cliente1.setSaldoActual(0.0);
+            cliente1.setDescuentoGeneral(0.0);
             clienteRepo.save(cliente1);
             
             // 7. Crear productos de prueba
