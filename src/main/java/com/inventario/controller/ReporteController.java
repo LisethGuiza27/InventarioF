@@ -85,6 +85,7 @@ public class ReporteController {
             return "reportes/kardex";
         }
     }
+
     @GetMapping("/proximos-vencer")
     public String reporteProximosVencer(@RequestParam(defaultValue = "30") int dias, Model model) {
         try {
@@ -127,5 +128,5 @@ public class ReporteController {
             return "reportes/rotacion";
         }
     }
-    
+
 }

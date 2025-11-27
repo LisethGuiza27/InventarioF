@@ -9,16 +9,19 @@ import java.util.Optional;
 
 @Repository
 public interface ProveedorRepository extends JpaRepository<Proveedor, Integer> {
+
     Optional<Proveedor> findByCodigo(String codigo);
+
     Optional<Proveedor> findByRfc(String rfc);
+
     List<Proveedor> findByActivoTrue();
-    
-    @Query("SELECT p FROM Proveedor p " +
-       "WHERE LOWER(p.razonSocial) LIKE LOWER(CONCAT('%', :termino, '%')) " +
-       "   OR LOWER(p.nombreComercial) LIKE LOWER(CONCAT('%', :termino, '%')) " +
-       "   OR LOWER(p.codigo) LIKE LOWER(CONCAT('%', :termino, '%'))")
+
+    @Query("SELECT p FROM Proveedor p "
+            + "WHERE LOWER(p.razonSocial) LIKE LOWER(CONCAT('%', :termino, '%')) "
+            + "   OR LOWER(p.nombreComercial) LIKE LOWER(CONCAT('%', :termino, '%')) "
+            + "   OR LOWER(p.codigo) LIKE LOWER(CONCAT('%', :termino, '%'))")
     List<Proveedor> buscar(String termino);
-    
+
     @Query("SELECT p FROM Proveedor p WHERE p.saldoPendiente > 0")
     List<Proveedor> findConSaldoPendiente();
 

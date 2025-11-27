@@ -20,31 +20,31 @@ public class SecurityConfig {
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
-            .authorizeHttpRequests(auth -> auth
+                .authorizeHttpRequests(auth -> auth
                 .requestMatchers("/login", "/css/**", "/js/**", "/images/**").permitAll()
                 .requestMatchers("/admin/**").hasRole("ADMIN")
                 .requestMatchers("/reportes/**").hasAnyRole("ADMIN", "GERENTE")
                 .anyRequest().authenticated()
-            )
-            .formLogin(form -> form
+                )
+                .formLogin(form -> form
                 .loginPage("/login")
                 .loginProcessingUrl("/login")
                 .defaultSuccessUrl("/dashboard", true)
                 .failureUrl("/login?error=true")
                 .permitAll()
-            )
-            .logout(logout -> logout
+                )
+                .logout(logout -> logout
                 .logoutUrl("/logout")
                 .logoutSuccessUrl("/login?logout=true")
                 .deleteCookies("JSESSIONID")
                 .invalidateHttpSession(true)
                 .permitAll()
-            )
-            .sessionManagement(session -> session
+                )
+                .sessionManagement(session -> session
                 .maximumSessions(1)
                 .maxSessionsPreventsLogin(false)
-            )
-            .csrf(csrf -> csrf.disable()); // Para desarrollo, en producción debe estar habilitado
+                )
+                .csrf(csrf -> csrf.disable()); // Para desarrollo, en producción debe estar habilitado
 
         return http.build();
     }

@@ -9,9 +9,11 @@ import java.util.Optional;
 
 @Repository
 public interface RolRepository extends JpaRepository<Rol, Integer> {
+
     Optional<Rol> findByNombre(String nombre);
+
     List<Rol> findByActivoTrue();
-    
+
     @Query("SELECT r FROM Rol r LEFT JOIN FETCH r.permisos WHERE r.id = :id")
     Optional<Rol> findByIdWithPermisos(Integer id);
 }

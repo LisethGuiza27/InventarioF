@@ -20,7 +20,7 @@ public class UsuarioController {
 
     @Autowired
     private UsuarioService service;
-    
+
     @Autowired
     private RolService rolService;
 
@@ -45,14 +45,14 @@ public class UsuarioController {
 
     @PostMapping
     public String crear(@Valid @ModelAttribute Usuario usuario,
-                       BindingResult result,
-                       RedirectAttributes redirect,
-                       Model model) {
+            BindingResult result,
+            RedirectAttributes redirect,
+            Model model) {
         if (result.hasErrors()) {
             model.addAttribute("roles", rolService.listarActivos());
             return "usuarios/formulario";
         }
-        
+
         try {
             service.crear(usuario);
             redirect.addFlashAttribute("mensaje", "Usuario creado exitosamente");
@@ -81,15 +81,15 @@ public class UsuarioController {
 
     @PostMapping("/{id}")
     public String actualizar(@PathVariable Integer id,
-                            @Valid @ModelAttribute Usuario usuario,
-                            BindingResult result,
-                            RedirectAttributes redirect,
-                            Model model) {
+            @Valid @ModelAttribute Usuario usuario,
+            BindingResult result,
+            RedirectAttributes redirect,
+            Model model) {
         if (result.hasErrors()) {
             model.addAttribute("roles", rolService.listarActivos());
             return "usuarios/formulario";
         }
-        
+
         try {
             service.actualizar(id, usuario);
             redirect.addFlashAttribute("mensaje", "Usuario actualizado exitosamente");
@@ -142,18 +142,18 @@ public class UsuarioController {
 
     @PostMapping("/cambiar-password")
     public String cambiarPassword(@RequestParam String passwordActual,
-                                 @RequestParam String passwordNueva,
-                                 @RequestParam String passwordConfirmar,
-                                 Authentication auth,
-                                 RedirectAttributes redirect) {
+            @RequestParam String passwordNueva,
+            @RequestParam String passwordConfirmar,
+            Authentication auth,
+            RedirectAttributes redirect) {
         try {
             if (!passwordNueva.equals(passwordConfirmar)) {
                 throw new Exception("Las contraseñas no coinciden");
             }
-            
+
             Usuario usuario = service.obtenerPorUsername(auth.getName())
                     .orElseThrow(() -> new Exception("Usuario no encontrado"));
-            
+
             service.cambiarPassword(usuario.getId(), passwordActual, passwordNueva);
             redirect.addFlashAttribute("mensaje", "Contraseña cambiada exitosamente");
             redirect.addFlashAttribute("tipo", "success");

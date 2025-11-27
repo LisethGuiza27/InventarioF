@@ -47,43 +47,53 @@ public class ClienteController {
 
     @PostMapping
     public String crear(@Valid @ModelAttribute Cliente cliente,
-                       BindingResult result,
-                       RedirectAttributes redirect) {
-        
+            BindingResult result,
+            RedirectAttributes redirect) {
+
         System.out.println("=== CREAR CLIENTE ===");
         System.out.println("Código: " + cliente.getCodigo());
         System.out.println("Nombre: " + cliente.getNombre());
-        
+
         if (result.hasErrors()) {
             System.out.println("Errores de validación:");
-            result.getAllErrors().forEach(error -> 
-                System.out.println("- " + error.getDefaultMessage())
+            result.getAllErrors().forEach(error
+                    -> System.out.println("- " + error.getDefaultMessage())
             );
             redirect.addFlashAttribute("mensaje", "Error de validación");
             redirect.addFlashAttribute("tipo", "error");
             return "redirect:/clientes/nuevo";
         }
-        
+
         try {
             // Inicializar valores por defecto si son null
-            if (cliente.getDiasCredito() == null) cliente.setDiasCredito(0);
-            if (cliente.getLimiteCredito() == null) cliente.setLimiteCredito(0.0);
-            if (cliente.getSaldoActual() == null) cliente.setSaldoActual(0.0);
-            if (cliente.getDescuentoGeneral() == null) cliente.setDescuentoGeneral(0.0);
-            if (cliente.getPais() == null || cliente.getPais().isEmpty()) cliente.setPais("México");
-            
+            if (cliente.getDiasCredito() == null) {
+                cliente.setDiasCredito(0);
+            }
+            if (cliente.getLimiteCredito() == null) {
+                cliente.setLimiteCredito(0.0);
+            }
+            if (cliente.getSaldoActual() == null) {
+                cliente.setSaldoActual(0.0);
+            }
+            if (cliente.getDescuentoGeneral() == null) {
+                cliente.setDescuentoGeneral(0.0);
+            }
+            if (cliente.getPais() == null || cliente.getPais().isEmpty()) {
+                cliente.setPais("México");
+            }
+
             Cliente clienteGuardado = service.crear(cliente);
-            
+
             System.out.println("Cliente guardado exitosamente con ID: " + clienteGuardado.getId());
-            
+
             redirect.addFlashAttribute("mensaje", "Cliente creado exitosamente");
             redirect.addFlashAttribute("tipo", "success");
             return "redirect:/clientes";
-            
+
         } catch (Exception e) {
             e.printStackTrace();
             System.err.println("Error al guardar cliente: " + e.getMessage());
-            
+
             redirect.addFlashAttribute("mensaje", "Error: " + e.getMessage());
             redirect.addFlashAttribute("tipo", "error");
             return "redirect:/clientes/nuevo";
@@ -106,15 +116,15 @@ public class ClienteController {
 
     @PostMapping("/{id}")
     public String actualizar(@PathVariable Integer id,
-                            @Valid @ModelAttribute Cliente cliente,
-                            BindingResult result,
-                            RedirectAttributes redirect) {
+            @Valid @ModelAttribute Cliente cliente,
+            BindingResult result,
+            RedirectAttributes redirect) {
         if (result.hasErrors()) {
             redirect.addFlashAttribute("mensaje", "Error de validación");
             redirect.addFlashAttribute("tipo", "error");
             return "redirect:/clientes/" + id + "/editar";
         }
-        
+
         try {
             service.actualizar(id, cliente);
             redirect.addFlashAttribute("mensaje", "Cliente actualizado exitosamente");

@@ -17,7 +17,7 @@ public class AlmacenService {
 
     @Autowired
     private AlmacenRepository repository;
-    
+
     @Autowired
     private InventarioAlmacenRepository inventarioRepo;
 
@@ -39,18 +39,27 @@ public class AlmacenService {
 
     public Almacen crear(Almacen almacen) throws Exception {
         validarAlmacen(almacen);
-        
+
         if (repository.findByCodigo(almacen.getCodigo()).isPresent()) {
             throw new Exception("El código ya existe");
         }
-        
+
         return repository.save(almacen);
     }
 
     public Almacen actualizar(Integer id, Almacen almacen) throws Exception {
         Almacen existente = repository.findById(id)
                 .orElseThrow(() -> new Exception("Almacén no encontrado"));
-        
+
+        // ✅ CORRECCIÓN: Validar código solo si cambió
+        if (almacen.getCodigo() != null && !almacen.getCodigo().equals(existente.getCodigo())) {
+            Optional<Almacen> codigoExistente = repository.findByCodigo(almacen.getCodigo());
+            if (codigoExistente.isPresent() && !codigoExistente.get().getId().equals(id)) {
+                throw new Exception("El código ya está registrado");
+            }
+            existente.setCodigo(almacen.getCodigo());
+        }
+
         if (almacen.getNombre() != null) {
             existente.setNombre(almacen.getNombre());
         }
@@ -75,14 +84,14 @@ public class AlmacenService {
         if (almacen.getActivo() != null) {
             existente.setActivo(almacen.getActivo());
         }
-        
+
         return repository.save(existente);
     }
 
     public void eliminar(Integer id) throws Exception {
         Almacen almacen = repository.findById(id)
                 .orElseThrow(() -> new Exception("Almacén no encontrado"));
-        
+
         almacen.setActivo(false);
         repository.save(almacen);
     }

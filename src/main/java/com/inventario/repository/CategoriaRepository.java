@@ -9,11 +9,15 @@ import java.util.Optional;
 
 @Repository
 public interface CategoriaRepository extends JpaRepository<Categoria, Integer> {
+
     Optional<Categoria> findByCodigo(String codigo);
+
     List<Categoria> findByActivoTrue();
+
     List<Categoria> findByCategoriaPadreIsNull();
+
     List<Categoria> findByCategoriaPadreId(Integer categoriaPadreId);
-    
+
     @Query("SELECT c FROM Categoria c WHERE c.nombre LIKE %:nombre%")
     List<Categoria> buscarPorNombre(String nombre);
 }

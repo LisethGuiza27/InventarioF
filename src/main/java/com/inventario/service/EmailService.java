@@ -14,16 +14,16 @@ import jakarta.mail.internet.MimeMessage;
  */
 @Service
 public class EmailService {
-    
+
     @Autowired(required = false)
     private JavaMailSender mailSender;
-    
+
     @Value("${spring.mail.username:noreply@inventario.com}")
     private String fromEmail;
-    
+
     @Value("${inventario.notifications.email-enabled:false}")
     private boolean emailEnabled;
-    
+
     /**
      * Envía un email simple
      */
@@ -32,23 +32,23 @@ public class EmailService {
             System.out.println("Email deshabilitado. Mensaje no enviado a: " + to);
             return;
         }
-        
+
         try {
             SimpleMailMessage message = new SimpleMailMessage();
             message.setFrom(fromEmail);
             message.setTo(to);
             message.setSubject(subject);
             message.setText(text);
-            
+
             mailSender.send(message);
             System.out.println("Email enviado exitosamente a: " + to);
-            
+
         } catch (Exception e) {
             System.err.println("Error al enviar email: " + e.getMessage());
             e.printStackTrace();
         }
     }
-    
+
     /**
      * Envía un email HTML
      */
@@ -57,31 +57,31 @@ public class EmailService {
             System.out.println("Email deshabilitado. Mensaje HTML no enviado a: " + to);
             return;
         }
-        
+
         try {
             MimeMessage message = mailSender.createMimeMessage();
             MimeMessageHelper helper = new MimeMessageHelper(message, true, "UTF-8");
-            
+
             helper.setFrom(fromEmail);
             helper.setTo(to);
             helper.setSubject(subject);
             helper.setText(htmlContent, true);
-            
+
             mailSender.send(message);
             System.out.println("Email HTML enviado exitosamente a: " + to);
-            
+
         } catch (MessagingException e) {
             System.err.println("Error al enviar email HTML: " + e.getMessage());
             e.printStackTrace();
         }
     }
-    
+
     /**
      * Notifica stock bajo
      */
     public void notificarStockBajo(String to, String productoNombre, int stockActual, int stockMinimo) {
         String subject = "⚠️ Alerta de Stock Bajo - " + productoNombre;
-        
+
         String htmlContent = String.format("""
             <html>
             <body style="font-family: Arial, sans-serif; padding: 20px;">
@@ -104,18 +104,18 @@ public class EmailService {
             </body>
             </html>
             """, productoNombre, stockActual, stockMinimo);
-        
+
         enviarEmailHtml(to, subject, htmlContent);
     }
-    
+
     /**
      * Notifica producto vencido o próximo a vencer
      */
     public void notificarProductoVencimiento(String to, String productoNombre, String fechaVencimiento, int diasRestantes) {
-        String subject = diasRestantes <= 0 ? 
-            "🚨 Producto Vencido - " + productoNombre : 
-            "⏰ Producto Próximo a Vencer - " + productoNombre;
-        
+        String subject = diasRestantes <= 0
+                ? "🚨 Producto Vencido - " + productoNombre
+                : "⏰ Producto Próximo a Vencer - " + productoNombre;
+
         String htmlContent = String.format("""
             <html>
             <body style="font-family: Arial, sans-serif; padding: 20px;">
@@ -137,23 +137,23 @@ public class EmailService {
                 </p>
             </body>
             </html>
-            """, 
-            diasRestantes <= 0 ? "#fee2e2" : "#fef3c7",
-            diasRestantes <= 0 ? "#ef4444" : "#f59e0b",
-            diasRestantes <= 0 ? "#991b1b" : "#92400e",
-            diasRestantes <= 0 ? "🚨 Producto Vencido" : "⏰ Producto Próximo a Vencer",
-            diasRestantes <= 0 ? "#7f1d1d" : "#78350f",
-            productoNombre,
-            diasRestantes <= 0 ? "#7f1d1d" : "#78350f",
-            fechaVencimiento,
-            diasRestantes <= 0 ? "VENCIDO" : "Vence en " + diasRestantes + " días",
-            diasRestantes <= 0 ? "#7f1d1d" : "#78350f",
-            diasRestantes <= 0 ? "Debe retirarse del inventario inmediatamente." : "Planifique su rotación o descuento."
+            """,
+                diasRestantes <= 0 ? "#fee2e2" : "#fef3c7",
+                diasRestantes <= 0 ? "#ef4444" : "#f59e0b",
+                diasRestantes <= 0 ? "#991b1b" : "#92400e",
+                diasRestantes <= 0 ? "🚨 Producto Vencido" : "⏰ Producto Próximo a Vencer",
+                diasRestantes <= 0 ? "#7f1d1d" : "#78350f",
+                productoNombre,
+                diasRestantes <= 0 ? "#7f1d1d" : "#78350f",
+                fechaVencimiento,
+                diasRestantes <= 0 ? "VENCIDO" : "Vence en " + diasRestantes + " días",
+                diasRestantes <= 0 ? "#7f1d1d" : "#78350f",
+                diasRestantes <= 0 ? "Debe retirarse del inventario inmediatamente." : "Planifique su rotación o descuento."
         );
-        
+
         enviarEmailHtml(to, subject, htmlContent);
     }
-    
+
     /**
      * Verifica si el servicio de email está disponible
      */

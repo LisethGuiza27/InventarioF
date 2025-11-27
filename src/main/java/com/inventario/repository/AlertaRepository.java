@@ -10,19 +10,23 @@ import java.util.List;
 
 @Repository
 public interface AlertaRepository extends JpaRepository<Alerta, Integer> {
+
     List<Alerta> findByActivaTrueAndLeidaFalse();
+
     List<Alerta> findByProductoId(Integer productoId);
+
     List<Alerta> findByTipo(TipoAlerta tipo);
+
     List<Alerta> findByPrioridad(PrioridadAlerta prioridad);
-    
-    @Query("SELECT a FROM Alerta a WHERE a.activa = true AND a.leida = false " +
-           "ORDER BY a.prioridad DESC, a.createdAt DESC")
+
+    @Query("SELECT a FROM Alerta a WHERE a.activa = true AND a.leida = false "
+            + "ORDER BY a.prioridad DESC, a.createdAt DESC")
     List<Alerta> findAlertasActivasNoLeidas();
-    
-    @Query("SELECT a FROM Alerta a WHERE a.activa = true AND a.leida = false " +
-           "AND a.prioridad IN ('ALTA', 'CRITICA') ORDER BY a.createdAt DESC")
+
+    @Query("SELECT a FROM Alerta a WHERE a.activa = true AND a.leida = false "
+            + "AND a.prioridad IN ('ALTA', 'CRITICA') ORDER BY a.createdAt DESC")
     List<Alerta> findAlertasCriticas();
-    
+
     @Query("SELECT COUNT(a) FROM Alerta a WHERE a.activa = true AND a.leida = false")
     long countAlertasActivas();
 }

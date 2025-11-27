@@ -13,23 +13,26 @@ import java.util.Optional;
 
 @Repository
 public interface MovimientoRepository extends JpaRepository<Movimiento, Integer> {
+
     Optional<Movimiento> findByCodigo(String codigo);
+
     List<Movimiento> findByTipo(TipoMovimiento tipo);
+
     List<Movimiento> findByEstado(EstadoMovimiento estado);
-    
+
     @Query("SELECT m FROM Movimiento m WHERE m.fechaMovimiento BETWEEN :inicio AND :fin")
-    List<Movimiento> findByFechaBetween(@Param("inicio") LocalDateTime inicio, 
-                                        @Param("fin") LocalDateTime fin);
-    
+    List<Movimiento> findByFechaBetween(@Param("inicio") LocalDateTime inicio,
+            @Param("fin") LocalDateTime fin);
+
     @Query("SELECT m FROM Movimiento m WHERE DATE(m.fechaMovimiento) = CURRENT_DATE")
     List<Movimiento> findMovimientosHoy();
-    
+
     @Query("SELECT m FROM Movimiento m ORDER BY m.fechaMovimiento DESC")
     List<Movimiento> findAllOrderByFechaDesc();
-    
+
     @Query("SELECT m FROM Movimiento m WHERE m.almacen.id = :almacenId")
     List<Movimiento> findByAlmacenId(@Param("almacenId") Integer almacenId);
-    
+
     @Query("SELECT COUNT(m) FROM Movimiento m WHERE DATE(m.fechaMovimiento) = CURRENT_DATE")
     long countMovimientosHoy();
 }

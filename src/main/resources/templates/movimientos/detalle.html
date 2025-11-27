@@ -1,1 +1,548 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Detalle Movimiento - Sistema de Inventario</title>
+        <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+        <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
+        <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+        <style>
+            :root {
+                --primary: #4f46e5;
+                --primary-dark: #4338ca;
+                --success: #10b981;
+                --warning: #f59e0b;
+                --danger: #ef4444;
+                --info: #06b6d4;
+                --dark: #0f172a;
+                --gray: #64748b;
+                --gray-light: #f1f5f9;
+                --white: #ffffff;
+            }
 
+            * {
+                margin: 0;
+                padding: 0;
+                box-sizing: border-box;
+            }
+
+            body {
+                font-family: 'Inter', sans-serif;
+                background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+                min-height: 100vh;
+            }
+
+            .sidebar {
+                position: fixed;
+                left: 0;
+                top: 0;
+                width: 260px;
+                height: 100vh;
+                background: var(--dark);
+                padding: 20px 0;
+                overflow-y: auto;
+                z-index: 1000;
+            }
+
+            .sidebar-logo {
+                padding: 0 25px 30px;
+                border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+                margin-bottom: 20px;
+            }
+
+            .sidebar-logo h1 {
+                color: var(--white);
+                font-size: 24px;
+                font-weight: 700;
+                display: flex;
+                align-items: center;
+                gap: 10px;
+            }
+
+            .sidebar-menu {
+                padding: 0 15px;
+            }
+
+            .menu-item {
+                display: block;
+                padding: 12px 20px;
+                color: rgba(255, 255, 255, 0.7);
+                text-decoration: none;
+                border-radius: 8px;
+                margin-bottom: 5px;
+                transition: all 0.3s ease;
+                display: flex;
+                align-items: center;
+                gap: 12px;
+                font-weight: 500;
+            }
+
+            .menu-item:hover {
+                background: rgba(255, 255, 255, 0.1);
+                color: var(--white);
+            }
+
+            .menu-item.active {
+                background: var(--primary);
+                color: var(--white);
+            }
+
+            .main-content {
+                margin-left: 260px;
+                padding: 30px;
+            }
+
+            .page-header {
+                background: var(--white);
+                padding: 25px 30px;
+                border-radius: 16px;
+                box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+                margin-bottom: 30px;
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+            }
+
+            .card {
+                background: var(--white);
+                border-radius: 16px;
+                box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+                margin-bottom: 25px;
+                overflow: hidden;
+            }
+
+            .card-header {
+                background: var(--gray-light);
+                padding: 20px 25px;
+                border-bottom: 2px solid #e2e8f0;
+                font-weight: 600;
+                font-size: 16px;
+                color: var(--dark);
+                display: flex;
+                align-items: center;
+                gap: 10px;
+            }
+
+            .card-body {
+                padding: 25px;
+            }
+
+            .info-grid {
+                display: grid;
+                grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+                gap: 20px;
+                margin-bottom: 25px;
+            }
+
+            .info-item {
+                padding: 15px;
+                background: var(--gray-light);
+                border-radius: 10px;
+            }
+
+            .info-label {
+                font-size: 12px;
+                font-weight: 600;
+                text-transform: uppercase;
+                color: var(--gray);
+                margin-bottom: 5px;
+                letter-spacing: 0.5px;
+            }
+
+            .info-value {
+                font-size: 16px;
+                font-weight: 600;
+                color: var(--dark);
+            }
+
+            .badge {
+                padding: 8px 16px;
+                border-radius: 8px;
+                font-size: 13px;
+                font-weight: 600;
+                display: inline-block;
+            }
+
+            .badge-success {
+                background: rgba(16, 185, 129, 0.1);
+                color: var(--success);
+            }
+
+            .badge-danger {
+                background: rgba(239, 68, 68, 0.1);
+                color: var(--danger);
+            }
+
+            .badge-warning {
+                background: rgba(245, 158, 11, 0.1);
+                color: var(--warning);
+            }
+
+            .badge-primary {
+                background: rgba(79, 70, 229, 0.1);
+                color: var(--primary);
+            }
+
+            .badge-info {
+                background: rgba(6, 182, 212, 0.1);
+                color: var(--info);
+            }
+
+            .modern-table {
+                width: 100%;
+                border-collapse: separate;
+                border-spacing: 0;
+            }
+
+            .modern-table thead th {
+                background: var(--gray-light);
+                padding: 16px;
+                font-size: 13px;
+                font-weight: 600;
+                text-transform: uppercase;
+                letter-spacing: 0.5px;
+                color: var(--gray);
+                text-align: left;
+            }
+
+            .modern-table tbody td {
+                padding: 16px;
+                border-bottom: 1px solid #f1f5f9;
+                font-size: 14px;
+            }
+
+            .modern-table tbody tr:hover {
+                background: rgba(79, 70, 229, 0.02);
+            }
+
+            .btn-modern {
+                padding: 10px 20px;
+                border-radius: 10px;
+                font-weight: 600;
+                border: none;
+                cursor: pointer;
+                transition: all 0.3s ease;
+                display: inline-flex;
+                align-items: center;
+                gap: 8px;
+                text-decoration: none;
+                font-size: 14px;
+            }
+
+            .btn-primary {
+                background: var(--primary);
+                color: white;
+            }
+
+            .btn-primary:hover {
+                background: var(--primary-dark);
+                color: white;
+            }
+
+            .btn-success {
+                background: var(--success);
+                color: white;
+            }
+
+            .btn-danger {
+                background: var(--danger);
+                color: white;
+            }
+
+            .btn-secondary {
+                background: var(--gray);
+                color: white;
+            }
+
+            .btn-outline {
+                background: white;
+                color: var(--gray);
+                border: 2px solid #e2e8f0;
+            }
+
+            .btn-outline:hover {
+                border-color: var(--primary);
+                color: var(--primary);
+            }
+
+            .alert {
+                padding: 15px 20px;
+                border-radius: 10px;
+                margin-bottom: 20px;
+                display: flex;
+                align-items: center;
+                gap: 10px;
+            }
+
+            .alert-success {
+                background: rgba(16, 185, 129, 0.1);
+                border-left: 4px solid var(--success);
+                color: var(--success);
+            }
+
+            .alert-error {
+                background: rgba(239, 68, 68, 0.1);
+                border-left: 4px solid var(--danger);
+                color: var(--danger);
+            }
+
+            .total-section {
+                background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+                padding: 25px;
+                border-radius: 12px;
+                color: white;
+                margin-top: 20px;
+            }
+
+            .total-row {
+                display: flex;
+                justify-content: space-between;
+                margin-bottom: 10px;
+                font-size: 15px;
+            }
+
+            .total-row.grand {
+                font-size: 24px;
+                font-weight: 700;
+                padding-top: 15px;
+                border-top: 2px solid rgba(255, 255, 255, 0.3);
+                margin-top: 15px;
+            }
+
+            .action-buttons {
+                display: flex;
+                gap: 10px;
+                flex-wrap: wrap;
+            }
+        </style>
+    </head>
+    <body>
+        <!-- Sidebar -->
+        <nav class="sidebar">
+            <div class="sidebar-logo">
+                <h1><i class="bi bi-boxes"></i> InventaPro</h1>
+            </div>
+            <div class="sidebar-menu">
+                <a href="/dashboard" class="menu-item">
+                    <i class="bi bi-speedometer2"></i> Dashboard
+                </a>
+                <a href="/productos" class="menu-item">
+                    <i class="bi bi-box-seam"></i> Productos
+                </a>
+                <a href="/movimientos" class="menu-item active">
+                    <i class="bi bi-arrow-left-right"></i> Movimientos
+                </a>
+                <a href="/almacenes" class="menu-item">
+                    <i class="bi bi-building"></i> Almacenes
+                </a>
+                <a href="/proveedores" class="menu-item">
+                    <i class="bi bi-truck"></i> Proveedores
+                </a>
+                <a href="/clientes" class="menu-item">
+                    <i class="bi bi-people"></i> Clientes
+                </a>
+                <a href="/reportes" class="menu-item">
+                    <i class="bi bi-graph-up"></i> Reportes
+                </a>
+                <a href="/usuarios" class="menu-item">
+                    <i class="bi bi-person-gear"></i> Usuarios
+                </a>
+                <a href="/logout" class="menu-item">
+                    <i class="bi bi-box-arrow-right"></i> Cerrar Sesión
+                </a>
+            </div>
+        </nav>
+
+        <!-- Main Content -->
+        <div class="main-content">
+            <!-- Header -->
+            <div class="page-header">
+                <div>
+                    <h2><i class="bi bi-file-text"></i> Detalle de Movimiento</h2>
+                    <p style="color: var(--gray); margin: 5px 0 0 0;" th:text="${movimiento.codigo}">Código del movimiento</p>
+                </div>
+                <a href="/movimientos" class="btn-modern btn-outline">
+                    <i class="bi bi-arrow-left"></i> Volver
+                </a>
+            </div>
+
+            <!-- Mensajes -->
+            <div th:if="${mensaje}" class="alert" th:classappend="${tipo == 'success'} ? 'alert-success' : 'alert-error'">
+                <i class="bi" th:classappend="${tipo == 'success'} ? 'bi-check-circle-fill' : 'bi-exclamation-triangle-fill'"></i>
+                <span th:text="${mensaje}">Mensaje</span>
+            </div>
+
+            <!-- Información General -->
+            <div class="card">
+                <div class="card-header">
+                    <i class="bi bi-info-circle"></i> Información General
+                </div>
+                <div class="card-body">
+                    <div class="info-grid">
+                        <div class="info-item">
+                            <div class="info-label">Código</div>
+                            <div class="info-value" th:text="${movimiento.codigo}">MOV-001</div>
+                        </div>
+                        <div class="info-item">
+                            <div class="info-label">Tipo</div>
+                            <div class="info-value">
+                                <span class="badge" 
+                                      th:classappend="${movimiento.tipo.name() == 'ENTRADA'} ? 'badge-success' : (${movimiento.tipo.name() == 'SALIDA'} ? 'badge-danger' : 'badge-info')"
+                                      th:text="${movimiento.tipo.name()}">
+                                    ENTRADA
+                                </span>
+                            </div>
+                        </div>
+                        <div class="info-item">
+                            <div class="info-label">Subtipo</div>
+                            <div class="info-value" th:text="${movimiento.subtipo.name()}">COMPRA</div>
+                        </div>
+                        <div class="info-item">
+                            <div class="info-label">Estado</div>
+                            <div class="info-value">
+                                <span class="badge" 
+                                      th:classappend="${movimiento.estado.name() == 'COMPLETADO'} ? 'badge-success' : (${movimiento.estado.name() == 'PENDIENTE'} ? 'badge-warning' : (${movimiento.estado.name() == 'APROBADO'} ? 'badge-primary' : 'badge-danger'))"
+                                      th:text="${movimiento.estado.name()}">
+                                    PENDIENTE
+                                </span>
+                            </div>
+                        </div>
+                        <div class="info-item">
+                            <div class="info-label">Fecha</div>
+                            <div class="info-value" th:text="${#temporals.format(movimiento.fechaMovimiento, 'dd/MM/yyyy HH:mm')}">26/11/2025 10:30</div>
+                        </div>
+                        <div class="info-item">
+                            <div class="info-label">Usuario</div>
+                            <div class="info-value" th:text="${movimiento.usuario.nombreCompleto}">Juan Pérez</div>
+                        </div>
+                        <div class="info-item" th:if="${movimiento.almacen}">
+                            <div class="info-label">Almacén</div>
+                            <div class="info-value" th:text="${movimiento.almacen.nombre}">Almacén Principal</div>
+                        </div>
+                        <div class="info-item" th:if="${movimiento.proveedor}">
+                            <div class="info-label">Proveedor</div>
+                            <div class="info-value" th:text="${movimiento.proveedor.nombre}">Proveedor ABC</div>
+                        </div>
+                        <div class="info-item" th:if="${movimiento.cliente}">
+                            <div class="info-label">Cliente</div>
+                            <div class="info-value" th:text="${movimiento.cliente.nombre}">Cliente XYZ</div>
+                        </div>
+                        <div class="info-item" th:if="${movimiento.numeroDocumento}">
+                            <div class="info-label">N° Documento</div>
+                            <div class="info-value" th:text="${movimiento.numeroDocumento}">DOC-12345</div>
+                        </div>
+                        <div class="info-item" th:if="${movimiento.fechaAprobacion}">
+                            <div class="info-label">Aprobado por</div>
+                            <div class="info-value" th:text="${movimiento.aprobadoPor.nombreCompleto}">Admin</div>
+                        </div>
+                        <div class="info-item" th:if="${movimiento.fechaAprobacion}">
+                            <div class="info-label">Fecha Aprobación</div>
+                            <div class="info-value" th:text="${#temporals.format(movimiento.fechaAprobacion, 'dd/MM/yyyy HH:mm')}">26/11/2025 11:00</div>
+                        </div>
+                    </div>
+
+                    <div class="info-item" th:if="${movimiento.observaciones}" style="margin-top: 15px;">
+                        <div class="info-label">Observaciones</div>
+                        <div class="info-value" th:text="${movimiento.observaciones}">Observaciones del movimiento</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Detalle de Productos -->
+            <div class="card">
+                <div class="card-header">
+                    <i class="bi bi-list-ul"></i> Detalle de Productos
+                </div>
+                <div style="padding: 0;">
+                    <table class="modern-table">
+                        <thead>
+                            <tr>
+                                <th>#</th>
+                                <th>Producto</th>
+                                <th>Código</th>
+                                <th>Cantidad</th>
+                                <th>Precio Unit.</th>
+                                <th>Subtotal</th>
+                                <th th:if="${movimiento.detalles[0]?.lote != null}">Lote</th>
+                                <th th:if="${movimiento.detalles[0]?.fechaVencimiento != null}">Vencimiento</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr th:each="detalle, stat : ${movimiento.detalles}">
+                                <td th:text="${stat.count}">1</td>
+                                <td>
+                                    <strong th:text="${detalle.producto.nombre}">Producto Ejemplo</strong>
+                                    <div style="font-size: 12px; color: var(--gray);" th:if="${detalle.observaciones}" th:text="${detalle.observaciones}">Observación</div>
+                                </td>
+                                <td th:text="${detalle.producto.codigo}">PROD-001</td>
+                                <td>
+                                    <strong th:text="${detalle.cantidad}">10</strong>
+                                    <span style="color: var(--gray); font-size: 12px;" th:text="${detalle.producto.unidadMedida}">UND</span>
+                                </td>
+                                <td>$<span th:text="${#numbers.formatDecimal(detalle.precioUnitario, 1, 'COMMA', 2, 'POINT')}">0.00</span></td>
+                                <td><strong style="color: var(--success);">$<span th:text="${#numbers.formatDecimal(detalle.subtotal, 1, 'COMMA', 2, 'POINT')}">0.00</span></strong></td>
+                                <td th:if="${detalle.lote != null}" th:text="${detalle.lote}">LOTE-001</td>
+                                <td th:if="${detalle.fechaVencimiento != null}" th:text="${#temporals.format(detalle.fechaVencimiento, 'dd/MM/yyyy')}">31/12/2025</td>
+                            </tr>
+                        </tbody>
+                    </table>
+
+                    <!-- Totales -->
+                    <div class="total-section" style="margin: 0; border-radius: 0;">
+                        <div class="total-row">
+                            <span>Total Items:</span>
+                            <strong th:text="${movimiento.totalItems}">0</strong>
+                        </div>
+                        <div class="total-row grand">
+                            <span>TOTAL:</span>
+                            <strong>$<span th:text="${#numbers.formatDecimal(movimiento.valorTotal, 1, 'COMMA', 2, 'POINT')}">0.00</span></strong>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Acciones -->
+            <div class="card">
+                <div class="card-body">
+                    <div class="action-buttons">
+                        <a href="/movimientos" class="btn-modern btn-secondary">
+                            <i class="bi bi-arrow-left"></i> Volver al Listado
+                        </a>
+
+                        <form th:if="${movimiento.estado.name() == 'PENDIENTE'}" 
+                              th:action="@{/movimientos/{id}/aprobar(id=${movimiento.id})}" 
+                              method="post" style="display: inline;">
+                            <button type="submit" class="btn-modern btn-primary">
+                                <i class="bi bi-check-circle"></i> Aprobar
+                            </button>
+                        </form>
+
+                        <form th:if="${movimiento.estado.name() == 'APROBADO'}" 
+                              th:action="@{/movimientos/{id}/completar(id=${movimiento.id})}" 
+                              method="post" style="display: inline;">
+                            <button type="submit" class="btn-modern btn-success">
+                                <i class="bi bi-check-all"></i> Completar
+                            </button>
+                        </form>
+
+                        <form th:if="${movimiento.estado.name() != 'COMPLETADO' && movimiento.estado.name() != 'ANULADO'}" 
+                              th:action="@{/movimientos/{id}/anular(id=${movimiento.id})}" 
+                              method="post" style="display: inline;"
+                              onsubmit="return confirm('¿Está seguro de anular este movimiento? Esta acción revertirá los cambios en el inventario.');">
+                            <button type="submit" class="btn-modern btn-danger">
+                                <i class="bi bi-x-circle"></i> Anular
+                            </button>
+                        </form>
+
+                        <button onclick="window.print()" class="btn-modern btn-outline">
+                            <i class="bi bi-printer"></i> Imprimir
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    </body>
+</html>

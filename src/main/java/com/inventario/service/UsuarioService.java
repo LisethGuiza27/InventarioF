@@ -20,7 +20,7 @@ public class UsuarioService implements UserDetailsService {
 
     @Autowired
     private UsuarioRepository repository;
-    
+
     @Autowired
     private PasswordEncoder passwordEncoder;
 
@@ -28,15 +28,15 @@ public class UsuarioService implements UserDetailsService {
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
         Usuario usuario = repository.findByUsername(username)
                 .orElseThrow(() -> new UsernameNotFoundException("Usuario no encontrado: " + username));
-        
+
         if (!usuario.getActivo()) {
             throw new UsernameNotFoundException("Usuario inactivo: " + username);
         }
-        
+
         if (usuario.estaBloqueado()) {
             throw new UsernameNotFoundException("Usuario bloqueado temporalmente");
         }
-        
+
         return org.springframework.security.core.userdetails.User
                 .withUsername(usuario.getUsername())
                 .password(usuario.getPassword())
@@ -52,19 +52,19 @@ public class UsuarioService implements UserDetailsService {
     public List<Usuario> listarTodos() {
         return repository.findAll();
     }
-    
+
     public List<Usuario> listarActivos() {
         return repository.findByActivoTrue();
     }
-    
+
     public Optional<Usuario> obtenerPorId(Integer id) {
         return repository.findById(id);
     }
-    
+
     public Optional<Usuario> obtenerPorUsername(String username) {
         return repository.findByUsername(username);
     }
-    
+
     public Optional<Usuario> obtenerPorEmail(String email) {
         return repository.findByEmail(email);
     }
@@ -72,20 +72,20 @@ public class UsuarioService implements UserDetailsService {
     // Crear usuario
     public Usuario crear(Usuario usuario) throws Exception {
         validarUsuario(usuario);
-        
+
         // Verificar username único
         if (repository.findByUsername(usuario.getUsername()).isPresent()) {
             throw new Exception("El username ya existe");
         }
-        
+
         // Verificar email único
         if (usuario.getEmail() != null && repository.findByEmail(usuario.getEmail()).isPresent()) {
             throw new Exception("El email ya está registrado");
         }
-        
+
         // Encriptar contraseña
         usuario.setPassword(passwordEncoder.encode(usuario.getPassword()));
-        
+
         return repository.save(usuario);
     }
 
@@ -93,12 +93,12 @@ public class UsuarioService implements UserDetailsService {
     public Usuario actualizar(Integer id, Usuario usuario) throws Exception {
         Usuario existente = repository.findById(id)
                 .orElseThrow(() -> new Exception("Usuario no encontrado"));
-        
+
         // Actualizar campos
         if (usuario.getNombreCompleto() != null) {
             existente.setNombreCompleto(usuario.getNombreCompleto());
         }
-        
+
         if (usuario.getEmail() != null) {
             // Verificar email único (exceptuando el usuario actual)
             Optional<Usuario> usuarioEmail = repository.findByEmail(usuario.getEmail());
@@ -107,19 +107,19 @@ public class UsuarioService implements UserDetailsService {
             }
             existente.setEmail(usuario.getEmail());
         }
-        
+
         if (usuario.getTelefono() != null) {
             existente.setTelefono(usuario.getTelefono());
         }
-        
+
         if (usuario.getRol() != null) {
             existente.setRol(usuario.getRol());
         }
-        
+
         if (usuario.getActivo() != null) {
             existente.setActivo(usuario.getActivo());
         }
-        
+
         return repository.save(existente);
     }
 
@@ -127,17 +127,17 @@ public class UsuarioService implements UserDetailsService {
     public void cambiarPassword(Integer usuarioId, String passwordActual, String passwordNueva) throws Exception {
         Usuario usuario = repository.findById(usuarioId)
                 .orElseThrow(() -> new Exception("Usuario no encontrado"));
-        
+
         // Verificar contraseña actual
         if (!passwordEncoder.matches(passwordActual, usuario.getPassword())) {
             throw new Exception("La contraseña actual es incorrecta");
         }
-        
+
         // Validar nueva contraseña
         if (passwordNueva.length() < 8) {
             throw new Exception("La contraseña debe tener al menos 8 caracteres");
         }
-        
+
         usuario.setPassword(passwordEncoder.encode(passwordNueva));
         repository.save(usuario);
     }
@@ -146,11 +146,11 @@ public class UsuarioService implements UserDetailsService {
     public void resetearPassword(Integer usuarioId, String nuevaPassword) throws Exception {
         Usuario usuario = repository.findById(usuarioId)
                 .orElseThrow(() -> new Exception("Usuario no encontrado"));
-        
+
         if (nuevaPassword.length() < 8) {
             throw new Exception("La contraseña debe tener al menos 8 caracteres");
         }
-        
+
         usuario.setPassword(passwordEncoder.encode(nuevaPassword));
         usuario.desbloquear();
         repository.save(usuario);
@@ -160,7 +160,7 @@ public class UsuarioService implements UserDetailsService {
     public void desactivar(Integer id) throws Exception {
         Usuario usuario = repository.findById(id)
                 .orElseThrow(() -> new Exception("Usuario no encontrado"));
-        
+
         usuario.setActivo(false);
         repository.save(usuario);
     }
@@ -169,7 +169,7 @@ public class UsuarioService implements UserDetailsService {
     public void activar(Integer id) throws Exception {
         Usuario usuario = repository.findById(id)
                 .orElseThrow(() -> new Exception("Usuario no encontrado"));
-        
+
         usuario.setActivo(true);
         usuario.desbloquear();
         repository.save(usuario);
@@ -179,7 +179,7 @@ public class UsuarioService implements UserDetailsService {
     public void bloquear(Integer id, int minutos) throws Exception {
         Usuario usuario = repository.findById(id)
                 .orElseThrow(() -> new Exception("Usuario no encontrado"));
-        
+
         usuario.bloquear(minutos);
         repository.save(usuario);
     }
@@ -188,7 +188,7 @@ public class UsuarioService implements UserDetailsService {
     public void desbloquear(Integer id) throws Exception {
         Usuario usuario = repository.findById(id)
                 .orElseThrow(() -> new Exception("Usuario no encontrado"));
-        
+
         usuario.desbloquear();
         repository.save(usuario);
     }
@@ -226,15 +226,15 @@ public class UsuarioService implements UserDetailsService {
         if (usuario.getUsername() == null || usuario.getUsername().trim().length() < 4) {
             throw new Exception("El username debe tener al menos 4 caracteres");
         }
-        
+
         if (usuario.getPassword() == null || usuario.getPassword().length() < 8) {
             throw new Exception("La contraseña debe tener al menos 8 caracteres");
         }
-        
+
         if (usuario.getNombreCompleto() == null || usuario.getNombreCompleto().trim().isEmpty()) {
             throw new Exception("El nombre completo es obligatorio");
         }
-        
+
         if (usuario.getRol() == null) {
             throw new Exception("Debe asignar un rol al usuario");
         }
@@ -244,7 +244,7 @@ public class UsuarioService implements UserDetailsService {
     public long contarUsuarios() {
         return repository.count();
     }
-    
+
     public long contarUsuariosActivos() {
         return repository.findByActivoTrue().size();
     }

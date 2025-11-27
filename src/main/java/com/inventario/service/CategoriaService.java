@@ -34,18 +34,18 @@ public class CategoriaService {
 
     public Categoria crear(Categoria categoria) throws Exception {
         validarCategoria(categoria);
-        
+
         if (repository.findByCodigo(categoria.getCodigo()).isPresent()) {
             throw new Exception("El código ya existe");
         }
-        
+
         return repository.save(categoria);
     }
 
     public Categoria actualizar(Integer id, Categoria categoria) throws Exception {
         Categoria existente = repository.findById(id)
                 .orElseThrow(() -> new Exception("Categoría no encontrada"));
-        
+
         if (categoria.getNombre() != null) {
             existente.setNombre(categoria.getNombre());
         }
@@ -64,14 +64,14 @@ public class CategoriaService {
         if (categoria.getActivo() != null) {
             existente.setActivo(categoria.getActivo());
         }
-        
+
         return repository.save(existente);
     }
 
     public void eliminar(Integer id) throws Exception {
         Categoria categoria = repository.findById(id)
                 .orElseThrow(() -> new Exception("Categoría no encontrada"));
-        
+
         categoria.setActivo(false);
         repository.save(categoria);
     }

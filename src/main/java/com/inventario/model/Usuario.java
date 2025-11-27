@@ -9,52 +9,52 @@ import java.time.LocalDateTime;
 @Entity
 @Table(name = "usuarios")
 public class Usuario {
-    
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
-    
+
     @NotBlank(message = "El username es obligatorio")
     @Size(min = 4, max = 50)
     @Column(nullable = false, unique = true, length = 50)
     private String username;
-    
+
     @NotBlank(message = "La contraseña es obligatoria")
     @Size(min = 8, max = 255)
     @Column(nullable = false, length = 255)
     private String password;
-    
+
     @NotBlank(message = "El nombre completo es obligatorio")
     @Size(min = 3, max = 150)
     @Column(name = "nombre_completo", nullable = false, length = 150)
     private String nombreCompleto;
-    
+
     @Email(message = "Email inválido")
     @Column(length = 100, unique = true)
     private String email;
-    
+
     @Column(length = 20)
     private String telefono;
-    
+
     @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "rol_id", nullable = false)
     private Rol rol;
-    
+
     @Column(nullable = false)
     private Boolean activo = true;
-    
+
     @Column(name = "ultimo_acceso")
     private LocalDateTime ultimoAcceso;
-    
+
     @Column(name = "intentos_fallidos")
     private Integer intentosFallidos = 0;
-    
+
     @Column(name = "bloqueado_hasta")
     private LocalDateTime bloqueadoHasta;
-    
+
     @Column(name = "created_at", updatable = false)
     private LocalDateTime createdAt;
-    
+
     @Column(name = "updated_at")
     private LocalDateTime updatedAt;
 
@@ -70,7 +70,8 @@ public class Usuario {
     }
 
     // Constructores
-    public Usuario() {}
+    public Usuario() {
+    }
 
     public Usuario(String username, String password, String nombreCompleto, String email, Rol rol) {
         this.username = username;
@@ -179,7 +180,9 @@ public class Usuario {
 
     // Métodos de utilidad
     public boolean estaBloqueado() {
-        if (bloqueadoHasta == null) return false;
+        if (bloqueadoHasta == null) {
+            return false;
+        }
         return LocalDateTime.now().isBefore(bloqueadoHasta);
     }
 
@@ -207,13 +210,13 @@ public class Usuario {
 
     @Override
     public String toString() {
-        return "Usuario{" +
-                "id=" + id +
-                ", username='" + username + '\'' +
-                ", nombreCompleto='" + nombreCompleto + '\'' +
-                ", email='" + email + '\'' +
-                ", rol=" + (rol != null ? rol.getNombre() : "null") +
-                ", activo=" + activo +
-                '}';
+        return "Usuario{"
+                + "id=" + id
+                + ", username='" + username + '\''
+                + ", nombreCompleto='" + nombreCompleto + '\''
+                + ", email='" + email + '\''
+                + ", rol=" + (rol != null ? rol.getNombre() : "null")
+                + ", activo=" + activo
+                + '}';
     }
 }

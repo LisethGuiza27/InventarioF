@@ -1,477 +1,477 @@
 <!DOCTYPE html>
 <html lang="es" xmlns:th="http://www.thymeleaf.org">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Detalle Producto - Sistema de Inventario</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-    <style>
-        :root {
-            --primary: #4f46e5;
-            --success: #10b981;
-            --warning: #f59e0b;
-            --danger: #ef4444;
-            --dark: #0f172a;
-            --gray: #64748b;
-            --gray-light: #f1f5f9;
-            --white: #ffffff;
-        }
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Detalle Producto - Sistema de Inventario</title>
+        <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+        <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
+        <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+        <style>
+            :root {
+                --primary: #4f46e5;
+                --success: #10b981;
+                --warning: #f59e0b;
+                --danger: #ef4444;
+                --dark: #0f172a;
+                --gray: #64748b;
+                --gray-light: #f1f5f9;
+                --white: #ffffff;
+            }
 
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
+            * {
+                margin: 0;
+                padding: 0;
+                box-sizing: border-box;
+            }
 
-        body {
-            font-family: 'Inter', sans-serif;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            min-height: 100vh;
-        }
+            body {
+                font-family: 'Inter', sans-serif;
+                background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+                min-height: 100vh;
+            }
 
-        .sidebar {
-            position: fixed;
-            left: 0;
-            top: 0;
-            width: 260px;
-            height: 100vh;
-            background: var(--dark);
-            padding: 20px 0;
-            overflow-y: auto;
-            z-index: 1000;
-        }
+            .sidebar {
+                position: fixed;
+                left: 0;
+                top: 0;
+                width: 260px;
+                height: 100vh;
+                background: var(--dark);
+                padding: 20px 0;
+                overflow-y: auto;
+                z-index: 1000;
+            }
 
-        .sidebar-logo {
-            padding: 0 25px 30px;
-            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-            margin-bottom: 20px;
-        }
+            .sidebar-logo {
+                padding: 0 25px 30px;
+                border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+                margin-bottom: 20px;
+            }
 
-        .sidebar-logo h1 {
-            color: var(--white);
-            font-size: 24px;
-            font-weight: 700;
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
+            .sidebar-logo h1 {
+                color: var(--white);
+                font-size: 24px;
+                font-weight: 700;
+                display: flex;
+                align-items: center;
+                gap: 10px;
+            }
 
-        .sidebar-menu {
-            padding: 0 15px;
-        }
+            .sidebar-menu {
+                padding: 0 15px;
+            }
 
-        .menu-item {
-            display: block;
-            padding: 12px 20px;
-            color: rgba(255, 255, 255, 0.7);
-            text-decoration: none;
-            border-radius: 8px;
-            margin-bottom: 5px;
-            transition: all 0.3s ease;
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            font-weight: 500;
-        }
+            .menu-item {
+                display: block;
+                padding: 12px 20px;
+                color: rgba(255, 255, 255, 0.7);
+                text-decoration: none;
+                border-radius: 8px;
+                margin-bottom: 5px;
+                transition: all 0.3s ease;
+                display: flex;
+                align-items: center;
+                gap: 12px;
+                font-weight: 500;
+            }
 
-        .menu-item:hover {
-            background: rgba(255, 255, 255, 0.1);
-            color: var(--white);
-        }
+            .menu-item:hover {
+                background: rgba(255, 255, 255, 0.1);
+                color: var(--white);
+            }
 
-        .menu-item.active {
-            background: var(--primary);
-            color: var(--white);
-        }
+            .menu-item.active {
+                background: var(--primary);
+                color: var(--white);
+            }
 
-        .main-content {
-            margin-left: 260px;
-            padding: 30px;
-        }
+            .main-content {
+                margin-left: 260px;
+                padding: 30px;
+            }
 
-        .page-header {
-            background: var(--white);
-            padding: 25px 30px;
-            border-radius: 16px;
-            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
-            margin-bottom: 30px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
+            .page-header {
+                background: var(--white);
+                padding: 25px 30px;
+                border-radius: 16px;
+                box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+                margin-bottom: 30px;
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+            }
 
-        .detail-card {
-            background: var(--white);
-            border-radius: 16px;
-            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
-            overflow: hidden;
-            margin-bottom: 25px;
-        }
+            .detail-card {
+                background: var(--white);
+                border-radius: 16px;
+                box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+                overflow: hidden;
+                margin-bottom: 25px;
+            }
 
-        .card-header {
-            padding: 20px 30px;
-            border-bottom: 2px solid var(--gray-light);
-            background: linear-gradient(135deg, var(--primary), #4338ca);
-            color: white;
-        }
+            .card-header {
+                padding: 20px 30px;
+                border-bottom: 2px solid var(--gray-light);
+                background: linear-gradient(135deg, var(--primary), #4338ca);
+                color: white;
+            }
 
-        .card-header h3 {
-            margin: 0;
-            font-size: 20px;
-            font-weight: 600;
-        }
+            .card-header h3 {
+                margin: 0;
+                font-size: 20px;
+                font-weight: 600;
+            }
 
-        .card-body {
-            padding: 30px;
-        }
+            .card-body {
+                padding: 30px;
+            }
 
-        .info-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-            gap: 20px;
-        }
+            .info-grid {
+                display: grid;
+                grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+                gap: 20px;
+            }
 
-        .info-item {
-            padding: 15px;
-            background: var(--gray-light);
-            border-radius: 10px;
-        }
+            .info-item {
+                padding: 15px;
+                background: var(--gray-light);
+                border-radius: 10px;
+            }
 
-        .info-label {
-            font-size: 13px;
-            color: var(--gray);
-            font-weight: 600;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-            margin-bottom: 5px;
-        }
+            .info-label {
+                font-size: 13px;
+                color: var(--gray);
+                font-weight: 600;
+                text-transform: uppercase;
+                letter-spacing: 0.5px;
+                margin-bottom: 5px;
+            }
 
-        .info-value {
-            font-size: 16px;
-            color: var(--dark);
-            font-weight: 600;
-        }
+            .info-value {
+                font-size: 16px;
+                color: var(--dark);
+                font-weight: 600;
+            }
 
-        .badge {
-            padding: 8px 16px;
-            border-radius: 8px;
-            font-size: 13px;
-            font-weight: 600;
-            display: inline-block;
-        }
+            .badge {
+                padding: 8px 16px;
+                border-radius: 8px;
+                font-size: 13px;
+                font-weight: 600;
+                display: inline-block;
+            }
 
-        .badge-success {
-            background: rgba(16, 185, 129, 0.1);
-            color: var(--success);
-        }
+            .badge-success {
+                background: rgba(16, 185, 129, 0.1);
+                color: var(--success);
+            }
 
-        .badge-danger {
-            background: rgba(239, 68, 68, 0.1);
-            color: var(--danger);
-        }
+            .badge-danger {
+                background: rgba(239, 68, 68, 0.1);
+                color: var(--danger);
+            }
 
-        .badge-warning {
-            background: rgba(245, 158, 11, 0.1);
-            color: var(--warning);
-        }
+            .badge-warning {
+                background: rgba(245, 158, 11, 0.1);
+                color: var(--warning);
+            }
 
-        .btn-modern {
-            padding: 12px 24px;
-            border-radius: 10px;
-            font-weight: 600;
-            border: none;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            display: inline-flex;
-            align-items: center;
-            gap: 8px;
-            text-decoration: none;
-        }
+            .btn-modern {
+                padding: 12px 24px;
+                border-radius: 10px;
+                font-weight: 600;
+                border: none;
+                cursor: pointer;
+                transition: all 0.3s ease;
+                display: inline-flex;
+                align-items: center;
+                gap: 8px;
+                text-decoration: none;
+            }
 
-        .btn-primary {
-            background: var(--primary);
-            color: white;
-        }
+            .btn-primary {
+                background: var(--primary);
+                color: white;
+            }
 
-        .btn-secondary {
-            background: var(--gray);
-            color: white;
-        }
+            .btn-secondary {
+                background: var(--gray);
+                color: white;
+            }
 
-        .btn-danger {
-            background: var(--danger);
-            color: white;
-        }
+            .btn-danger {
+                background: var(--danger);
+                color: white;
+            }
 
-        .btn-modern:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
-            color: white;
-        }
+            .btn-modern:hover {
+                transform: translateY(-2px);
+                box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
+                color: white;
+            }
 
-        .product-image {
-            width: 100%;
-            max-width: 400px;
-            height: 400px;
-            object-fit: cover;
-            border-radius: 12px;
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-        }
+            .product-image {
+                width: 100%;
+                max-width: 400px;
+                height: 400px;
+                object-fit: cover;
+                border-radius: 12px;
+                box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            }
 
-        .stat-box {
-            text-align: center;
-            padding: 20px;
-            background: linear-gradient(135deg, var(--primary), #4338ca);
-            color: white;
-            border-radius: 12px;
-        }
+            .stat-box {
+                text-align: center;
+                padding: 20px;
+                background: linear-gradient(135deg, var(--primary), #4338ca);
+                color: white;
+                border-radius: 12px;
+            }
 
-        .stat-value {
-            font-size: 32px;
-            font-weight: 700;
-            margin-bottom: 5px;
-        }
+            .stat-value {
+                font-size: 32px;
+                font-weight: 700;
+                margin-bottom: 5px;
+            }
 
-        .stat-label {
-            font-size: 14px;
-            opacity: 0.9;
-        }
-    </style>
-</head>
-<body>
-    <!-- Sidebar -->
-    <nav class="sidebar">
-        <div class="sidebar-logo">
-            <h1><i class="bi bi-boxes"></i> InventaPro</h1>
-        </div>
-        <div class="sidebar-menu">
-            <a href="/dashboard" class="menu-item">
-                <i class="bi bi-speedometer2"></i> Dashboard
-            </a>
-            <a href="/productos" class="menu-item active">
-                <i class="bi bi-box-seam"></i> Productos
-            </a>
-            <a href="/movimientos" class="menu-item">
-                <i class="bi bi-arrow-left-right"></i> Movimientos
-            </a>
-            <a href="/almacenes" class="menu-item">
-                <i class="bi bi-building"></i> Almacenes
-            </a>
-            <a href="/proveedores" class="menu-item">
-                <i class="bi bi-truck"></i> Proveedores
-            </a>
-            <a href="/clientes" class="menu-item">
-                <i class="bi bi-people"></i> Clientes
-            </a>
-            <a href="/reportes" class="menu-item">
-                <i class="bi bi-graph-up"></i> Reportes
-            </a>
-            <a href="/usuarios" class="menu-item">
-                <i class="bi bi-person-gear"></i> Usuarios
-            </a>
-            <a href="/logout" class="menu-item">
-                <i class="bi bi-box-arrow-right"></i> Cerrar Sesión
-            </a>
-        </div>
-    </nav>
-
-    <!-- Main Content -->
-    <div class="main-content">
-        <div class="page-header">
-            <div>
-                <h2><i class="bi bi-box-seam"></i> Detalle del Producto</h2>
-                <p style="color: var(--gray); margin: 5px 0 0 0;">Información completa del producto</p>
+            .stat-label {
+                font-size: 14px;
+                opacity: 0.9;
+            }
+        </style>
+    </head>
+    <body>
+        <!-- Sidebar -->
+        <nav class="sidebar">
+            <div class="sidebar-logo">
+                <h1><i class="bi bi-boxes"></i> InventaPro</h1>
             </div>
-            <div style="display: flex; gap: 10px;">
-                <a th:href="@{/productos/{id}/editar(id=${producto.id})}" class="btn-modern btn-primary">
-                    <i class="bi bi-pencil"></i> Editar
+            <div class="sidebar-menu">
+                <a href="/dashboard" class="menu-item">
+                    <i class="bi bi-speedometer2"></i> Dashboard
                 </a>
-                <a href="/productos" class="btn-modern btn-secondary">
-                    <i class="bi bi-arrow-left"></i> Volver
+                <a href="/productos" class="menu-item active">
+                    <i class="bi bi-box-seam"></i> Productos
+                </a>
+                <a href="/movimientos" class="menu-item">
+                    <i class="bi bi-arrow-left-right"></i> Movimientos
+                </a>
+                <a href="/almacenes" class="menu-item">
+                    <i class="bi bi-building"></i> Almacenes
+                </a>
+                <a href="/proveedores" class="menu-item">
+                    <i class="bi bi-truck"></i> Proveedores
+                </a>
+                <a href="/clientes" class="menu-item">
+                    <i class="bi bi-people"></i> Clientes
+                </a>
+                <a href="/reportes" class="menu-item">
+                    <i class="bi bi-graph-up"></i> Reportes
+                </a>
+                <a href="/usuarios" class="menu-item">
+                    <i class="bi bi-person-gear"></i> Usuarios
+                </a>
+                <a href="/logout" class="menu-item">
+                    <i class="bi bi-box-arrow-right"></i> Cerrar Sesión
                 </a>
             </div>
-        </div>
+        </nav>
 
-        <!-- Información General -->
-        <div class="detail-card">
-            <div class="card-header">
-                <h3><i class="bi bi-info-circle"></i> Información General</h3>
+        <!-- Main Content -->
+        <div class="main-content">
+            <div class="page-header">
+                <div>
+                    <h2><i class="bi bi-box-seam"></i> Detalle del Producto</h2>
+                    <p style="color: var(--gray); margin: 5px 0 0 0;">Información completa del producto</p>
+                </div>
+                <div style="display: flex; gap: 10px;">
+                    <a th:href="@{/productos/{id}/editar(id=${producto.id})}" class="btn-modern btn-primary">
+                        <i class="bi bi-pencil"></i> Editar
+                    </a>
+                    <a href="/productos" class="btn-modern btn-secondary">
+                        <i class="bi bi-arrow-left"></i> Volver
+                    </a>
+                </div>
             </div>
-            <div class="card-body">
-                <div class="row">
-                    <div class="col-md-8">
-                        <div class="info-grid">
-                            <div class="info-item">
-                                <div class="info-label">Código</div>
-                                <div class="info-value" th:text="${producto.codigo}">PROD001</div>
-                            </div>
-                            <div class="info-item">
-                                <div class="info-label">Nombre</div>
-                                <div class="info-value" th:text="${producto.nombre}">Producto</div>
-                            </div>
-                            <div class="info-item">
-                                <div class="info-label">Categoría</div>
-                                <div class="info-value">
-                                    <span th:if="${producto.categoria != null}" th:text="${producto.categoria.nombre}">Categoría</span>
-                                    <span th:if="${producto.categoria == null}">Sin categoría</span>
+
+            <!-- Información General -->
+            <div class="detail-card">
+                <div class="card-header">
+                    <h3><i class="bi bi-info-circle"></i> Información General</h3>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-8">
+                            <div class="info-grid">
+                                <div class="info-item">
+                                    <div class="info-label">Código</div>
+                                    <div class="info-value" th:text="${producto.codigo}">PROD001</div>
+                                </div>
+                                <div class="info-item">
+                                    <div class="info-label">Nombre</div>
+                                    <div class="info-value" th:text="${producto.nombre}">Producto</div>
+                                </div>
+                                <div class="info-item">
+                                    <div class="info-label">Categoría</div>
+                                    <div class="info-value">
+                                        <span th:if="${producto.categoria != null}" th:text="${producto.categoria.nombre}">Categoría</span>
+                                        <span th:if="${producto.categoria == null}">Sin categoría</span>
+                                    </div>
+                                </div>
+                                <div class="info-item">
+                                    <div class="info-label">Proveedor</div>
+                                    <div class="info-value">
+                                        <span th:if="${producto.proveedor != null}" th:text="${producto.proveedor.nombre}">Proveedor</span>
+                                        <span th:if="${producto.proveedor == null}">Sin proveedor</span>
+                                    </div>
+                                </div>
+                                <div class="info-item">
+                                    <div class="info-label">Código de Barras</div>
+                                    <div class="info-value" th:text="${producto.codigoBarras != null ? producto.codigoBarras : '-'}">-</div>
+                                </div>
+                                <div class="info-item">
+                                    <div class="info-label">Estado</div>
+                                    <div class="info-value">
+                                        <span th:if="${producto.activo}" class="badge badge-success">Activo</span>
+                                        <span th:if="${!producto.activo}" class="badge badge-danger">Inactivo</span>
+                                    </div>
                                 </div>
                             </div>
-                            <div class="info-item">
-                                <div class="info-label">Proveedor</div>
-                                <div class="info-value">
-                                    <span th:if="${producto.proveedor != null}" th:text="${producto.proveedor.nombre}">Proveedor</span>
-                                    <span th:if="${producto.proveedor == null}">Sin proveedor</span>
-                                </div>
-                            </div>
-                            <div class="info-item">
-                                <div class="info-label">Código de Barras</div>
-                                <div class="info-value" th:text="${producto.codigoBarras != null ? producto.codigoBarras : '-'}">-</div>
-                            </div>
-                            <div class="info-item">
-                                <div class="info-label">Estado</div>
-                                <div class="info-value">
-                                    <span th:if="${producto.activo}" class="badge badge-success">Activo</span>
-                                    <span th:if="${!producto.activo}" class="badge badge-danger">Inactivo</span>
-                                </div>
+                            <div style="margin-top: 20px;" th:if="${producto.descripcion != null}">
+                                <div class="info-label">Descripción</div>
+                                <p style="margin: 10px 0; color: var(--gray);" th:text="${producto.descripcion}">Descripción del producto</p>
                             </div>
                         </div>
-                        <div style="margin-top: 20px;" th:if="${producto.descripcion != null}">
-                            <div class="info-label">Descripción</div>
-                            <p style="margin: 10px 0; color: var(--gray);" th:text="${producto.descripcion}">Descripción del producto</p>
+                        <div class="col-md-4 text-center">
+                            <img th:if="${producto.imagenUrl != null}" th:src="@{${producto.imagenUrl}}" 
+                                 class="product-image" alt="Imagen del producto">
+                            <div th:if="${producto.imagenUrl == null}" 
+                                 style="width: 100%; max-width: 400px; height: 400px; background: var(--gray-light);
+                                 border-radius: 12px; display: flex; align-items: center; justify-content: center;">
+                                <i class="bi bi-image" style="font-size: 64px; color: var(--gray);"></i>
+                            </div>
                         </div>
                     </div>
-                    <div class="col-md-4 text-center">
-                        <img th:if="${producto.imagenUrl != null}" th:src="@{${producto.imagenUrl}}" 
-                             class="product-image" alt="Imagen del producto">
-                        <div th:if="${producto.imagenUrl == null}" 
-                             style="width: 100%; max-width: 400px; height: 400px; background: var(--gray-light); 
-                                    border-radius: 12px; display: flex; align-items: center; justify-content: center;">
-                            <i class="bi bi-image" style="font-size: 64px; color: var(--gray);"></i>
+                </div>
+            </div>
+
+            <!-- Precios e Inventario -->
+            <div class="row">
+                <div class="col-md-6">
+                    <div class="detail-card">
+                        <div class="card-header">
+                            <h3><i class="bi bi-currency-dollar"></i> Precios</h3>
+                        </div>
+                        <div class="card-body">
+                            <div class="info-grid">
+                                <div class="info-item">
+                                    <div class="info-label">Precio Venta</div>
+                                    <div class="info-value" style="color: var(--success);">
+                                        $<span th:text="${#numbers.formatDecimal(producto.precioVenta, 1, 'COMMA', 2, 'POINT')}">0.00</span>
+                                    </div>
+                                </div>
+                                <div class="info-item">
+                                    <div class="info-label">Precio Compra</div>
+                                    <div class="info-value">
+                                        $<span th:text="${producto.precioCompra != null ? #numbers.formatDecimal(producto.precioCompra, 1, 'COMMA', 2, 'POINT') : '0.00'}">0.00</span>
+                                    </div>
+                                </div>
+                                <div class="info-item">
+                                    <div class="info-label">Precio Mayoreo</div>
+                                    <div class="info-value">
+                                        $<span th:text="${producto.precioMayoreo != null ? #numbers.formatDecimal(producto.precioMayoreo, 1, 'COMMA', 2, 'POINT') : '0.00'}">0.00</span>
+                                    </div>
+                                </div>
+                                <div class="info-item">
+                                    <div class="info-label">Margen de Ganancia</div>
+                                    <div class="info-value">
+                                        <span th:text="${#numbers.formatDecimal(producto.calcularMargen(), 1, 2)}">0.00</span>%
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="detail-card">
+                        <div class="card-header">
+                            <h3><i class="bi bi-boxes"></i> Inventario</h3>
+                        </div>
+                        <div class="card-body">
+                            <div class="row mb-3">
+                                <div class="col-4">
+                                    <div class="stat-box" th:style="${producto.stockActual <= 0} ? 'background: linear-gradient(135deg, #ef4444, #dc2626);' : 
+                                         (${producto.stockActual <= producto.stockMinimo} ? 'background: linear-gradient(135deg, #f59e0b, #d97706);' : '')">
+                                        <div class="stat-value" th:text="${producto.stockActual}">0</div>
+                                        <div class="stat-label">Stock Actual</div>
+                                    </div>
+                                </div>
+                                <div class="col-4">
+                                    <div class="stat-box" style="background: linear-gradient(135deg, #06b6d4, #0891b2);">
+                                        <div class="stat-value" th:text="${producto.stockMinimo}">0</div>
+                                        <div class="stat-label">Stock Mínimo</div>
+                                    </div>
+                                </div>
+                                <div class="col-4">
+                                    <div class="stat-box" style="background: linear-gradient(135deg, #10b981, #059669);">
+                                        <div class="stat-value" th:text="${producto.stockMaximo != null ? producto.stockMaximo : '-'}">0</div>
+                                        <div class="stat-label">Stock Máximo</div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="info-grid">
+                                <div class="info-item">
+                                    <div class="info-label">Valor en Stock</div>
+                                    <div class="info-value" style="color: var(--success);">
+                                        $<span th:text="${#numbers.formatDecimal(producto.calcularValorStock(), 1, 'COMMA', 2, 'POINT')}">0.00</span>
+                                    </div>
+                                </div>
+                                <div class="info-item">
+                                    <div class="info-label">Unidad de Medida</div>
+                                    <div class="info-value" th:text="${producto.unidadMedida}">UND</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Información Adicional -->
+            <div class="detail-card" th:if="${producto.marca != null or producto.modelo != null or producto.color != null or producto.talla != null}">
+                <div class="card-header">
+                    <h3><i class="bi bi-tags"></i> Características</h3>
+                </div>
+                <div class="card-body">
+                    <div class="info-grid">
+                        <div class="info-item" th:if="${producto.marca != null}">
+                            <div class="info-label">Marca</div>
+                            <div class="info-value" th:text="${producto.marca}">-</div>
+                        </div>
+                        <div class="info-item" th:if="${producto.modelo != null}">
+                            <div class="info-label">Modelo</div>
+                            <div class="info-value" th:text="${producto.modelo}">-</div>
+                        </div>
+                        <div class="info-item" th:if="${producto.color != null}">
+                            <div class="info-label">Color</div>
+                            <div class="info-value" th:text="${producto.color}">-</div>
+                        </div>
+                        <div class="info-item" th:if="${producto.talla != null}">
+                            <div class="info-label">Talla</div>
+                            <div class="info-value" th:text="${producto.talla}">-</div>
+                        </div>
+                        <div class="info-item" th:if="${producto.peso != null}">
+                            <div class="info-label">Peso</div>
+                            <div class="info-value"><span th:text="${producto.peso}">0</span> kg</div>
+                        </div>
+                        <div class="info-item" th:if="${producto.fechaVencimiento != null}">
+                            <div class="info-label">Fecha Vencimiento</div>
+                            <div class="info-value" th:text="${#temporals.format(producto.fechaVencimiento, 'dd/MM/yyyy')}">-</div>
                         </div>
                     </div>
                 </div>
             </div>
         </div>
 
-        <!-- Precios e Inventario -->
-        <div class="row">
-            <div class="col-md-6">
-                <div class="detail-card">
-                    <div class="card-header">
-                        <h3><i class="bi bi-currency-dollar"></i> Precios</h3>
-                    </div>
-                    <div class="card-body">
-                        <div class="info-grid">
-                            <div class="info-item">
-                                <div class="info-label">Precio Venta</div>
-                                <div class="info-value" style="color: var(--success);">
-                                    $<span th:text="${#numbers.formatDecimal(producto.precioVenta, 1, 'COMMA', 2, 'POINT')}">0.00</span>
-                                </div>
-                            </div>
-                            <div class="info-item">
-                                <div class="info-label">Precio Compra</div>
-                                <div class="info-value">
-                                    $<span th:text="${producto.precioCompra != null ? #numbers.formatDecimal(producto.precioCompra, 1, 'COMMA', 2, 'POINT') : '0.00'}">0.00</span>
-                                </div>
-                            </div>
-                            <div class="info-item">
-                                <div class="info-label">Precio Mayoreo</div>
-                                <div class="info-value">
-                                    $<span th:text="${producto.precioMayoreo != null ? #numbers.formatDecimal(producto.precioMayoreo, 1, 'COMMA', 2, 'POINT') : '0.00'}">0.00</span>
-                                </div>
-                            </div>
-                            <div class="info-item">
-                                <div class="info-label">Margen de Ganancia</div>
-                                <div class="info-value">
-                                    <span th:text="${#numbers.formatDecimal(producto.calcularMargen(), 1, 2)}">0.00</span>%
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            <div class="col-md-6">
-                <div class="detail-card">
-                    <div class="card-header">
-                        <h3><i class="bi bi-boxes"></i> Inventario</h3>
-                    </div>
-                    <div class="card-body">
-                        <div class="row mb-3">
-                            <div class="col-4">
-                                <div class="stat-box" th:style="${producto.stockActual <= 0} ? 'background: linear-gradient(135deg, #ef4444, #dc2626);' : 
-                                                                 (${producto.stockActual <= producto.stockMinimo} ? 'background: linear-gradient(135deg, #f59e0b, #d97706);' : '')">
-                                    <div class="stat-value" th:text="${producto.stockActual}">0</div>
-                                    <div class="stat-label">Stock Actual</div>
-                                </div>
-                            </div>
-                            <div class="col-4">
-                                <div class="stat-box" style="background: linear-gradient(135deg, #06b6d4, #0891b2);">
-                                    <div class="stat-value" th:text="${producto.stockMinimo}">0</div>
-                                    <div class="stat-label">Stock Mínimo</div>
-                                </div>
-                            </div>
-                            <div class="col-4">
-                                <div class="stat-box" style="background: linear-gradient(135deg, #10b981, #059669);">
-                                    <div class="stat-value" th:text="${producto.stockMaximo != null ? producto.stockMaximo : '-'}">0</div>
-                                    <div class="stat-label">Stock Máximo</div>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="info-grid">
-                            <div class="info-item">
-                                <div class="info-label">Valor en Stock</div>
-                                <div class="info-value" style="color: var(--success);">
-                                    $<span th:text="${#numbers.formatDecimal(producto.calcularValorStock(), 1, 'COMMA', 2, 'POINT')}">0.00</span>
-                                </div>
-                            </div>
-                            <div class="info-item">
-                                <div class="info-label">Unidad de Medida</div>
-                                <div class="info-value" th:text="${producto.unidadMedida}">UND</div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <!-- Información Adicional -->
-        <div class="detail-card" th:if="${producto.marca != null or producto.modelo != null or producto.color != null or producto.talla != null}">
-            <div class="card-header">
-                <h3><i class="bi bi-tags"></i> Características</h3>
-            </div>
-            <div class="card-body">
-                <div class="info-grid">
-                    <div class="info-item" th:if="${producto.marca != null}">
-                        <div class="info-label">Marca</div>
-                        <div class="info-value" th:text="${producto.marca}">-</div>
-                    </div>
-                    <div class="info-item" th:if="${producto.modelo != null}">
-                        <div class="info-label">Modelo</div>
-                        <div class="info-value" th:text="${producto.modelo}">-</div>
-                    </div>
-                    <div class="info-item" th:if="${producto.color != null}">
-                        <div class="info-label">Color</div>
-                        <div class="info-value" th:text="${producto.color}">-</div>
-                    </div>
-                    <div class="info-item" th:if="${producto.talla != null}">
-                        <div class="info-label">Talla</div>
-                        <div class="info-value" th:text="${producto.talla}">-</div>
-                    </div>
-                    <div class="info-item" th:if="${producto.peso != null}">
-                        <div class="info-label">Peso</div>
-                        <div class="info-value"><span th:text="${producto.peso}">0</span> kg</div>
-                    </div>
-                    <div class="info-item" th:if="${producto.fechaVencimiento != null}">
-                        <div class="info-label">Fecha Vencimiento</div>
-                        <div class="info-value" th:text="${#temporals.format(producto.fechaVencimiento, 'dd/MM/yyyy')}">-</div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-</body>
+        <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    </body>
 </html>

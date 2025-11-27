@@ -10,6 +10,7 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 @AllArgsConstructor
 public class ProductoDTO {
+
     private Integer id;
     private String codigo;
     private String nombre;
@@ -48,14 +49,14 @@ public class ProductoDTO {
     private Boolean activo;
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
-    
+
     // Campos calculados
     private Double valorStock;
     private Double margenGanancia;
     private String estadoStock; // "NORMAL", "BAJO", "AGOTADO"
     private Integer diasParaVencer;
     private Boolean requiereReabastecimiento;
-    
+
     // Constructor desde entidad
     public static ProductoDTO fromEntity(com.inventario.model.Producto producto) {
         ProductoDTO dto = new ProductoDTO();
@@ -63,17 +64,17 @@ public class ProductoDTO {
         dto.setCodigo(producto.getCodigo());
         dto.setNombre(producto.getNombre());
         dto.setDescripcion(producto.getDescripcion());
-        
+
         if (producto.getCategoria() != null) {
             dto.setCategoriaNombre(producto.getCategoria().getNombre());
             dto.setCategoriaId(producto.getCategoria().getId());
         }
-        
+
         if (producto.getProveedor() != null) {
             dto.setProveedorNombre(producto.getProveedor().getNombre());
             dto.setProveedorId(producto.getProveedor().getId());
         }
-        
+
         dto.setCodigoBarras(producto.getCodigoBarras());
         dto.setSku(producto.getSku());
         dto.setUnidadMedida(producto.getUnidadMedida());
@@ -104,29 +105,33 @@ public class ProductoDTO {
         dto.setActivo(producto.getActivo());
         dto.setCreatedAt(producto.getCreatedAt());
         dto.setUpdatedAt(producto.getUpdatedAt());
-        
+
         // Calcular campos adicionales
         dto.setValorStock(producto.calcularValorStock());
         dto.setMargenGanancia(producto.calcularMargen());
         dto.setEstadoStock(determinarEstadoStock(producto));
-        
+
         if (producto.getFechaVencimiento() != null) {
             dto.setDiasParaVencer(
-                (int) java.time.temporal.ChronoUnit.DAYS.between(
-                    LocalDate.now(), 
-                    producto.getFechaVencimiento()
-                )
+                    (int) java.time.temporal.ChronoUnit.DAYS.between(
+                            LocalDate.now(),
+                            producto.getFechaVencimiento()
+                    )
             );
         }
-        
+
         dto.setRequiereReabastecimiento(producto.necesitaReabastecimiento());
-        
+
         return dto;
     }
-    
+
     private static String determinarEstadoStock(com.inventario.model.Producto producto) {
-        if (producto.estaAgotado()) return "AGOTADO";
-        if (producto.esStockBajo()) return "BAJO";
+        if (producto.estaAgotado()) {
+            return "AGOTADO";
+        }
+        if (producto.esStockBajo()) {
+            return "BAJO";
+        }
         return "NORMAL";
     }
 }

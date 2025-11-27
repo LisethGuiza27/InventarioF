@@ -1,67 +1,445 @@
 <!DOCTYPE html>
-<html lang="es">
-<head>
-    <meta charset="UTF-8">
-    <title>Formulario Almacén</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-</head>
-<body>
-    <div class="container mt-4">
-        <h2>Formulario Almacén</h2>
-        
-        <form th:action="@{/almacenes}" th:method="post" th:object="${almacen}">
-            <input type="hidden" th:field="*{id}">
-            
-            <div class="mb-3">
-                <label>Código:</label>
-                <input type="text" class="form-control" th:field="*{codigo}" required>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title th:text="${almacen.id != null} ? 'Editar Almacén' : 'Nuevo Almacén'">Formulario Almacén</title>
+        <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+        <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
+        <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+        <style>
+            :root {
+                --primary: #4f46e5;
+                --primary-dark: #4338ca;
+                --success: #10b981;
+                --warning: #f59e0b;
+                --danger: #ef4444;
+                --info: #06b6d4;
+                --dark: #0f172a;
+                --gray: #64748b;
+                --gray-light: #f1f5f9;
+                --white: #ffffff;
+            }
+
+            * {
+                margin: 0;
+                padding: 0;
+                box-sizing: border-box;
+            }
+
+            body {
+                font-family: 'Inter', sans-serif;
+                background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+                min-height: 100vh;
+            }
+
+            .sidebar {
+                position: fixed;
+                left: 0;
+                top: 0;
+                width: 260px;
+                height: 100vh;
+                background: var(--dark);
+                padding: 20px 0;
+                overflow-y: auto;
+                z-index: 1000;
+            }
+
+            .sidebar-logo {
+                padding: 0 25px 30px;
+                border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+                margin-bottom: 20px;
+            }
+
+            .sidebar-logo h1 {
+                color: var(--white);
+                font-size: 24px;
+                font-weight: 700;
+                display: flex;
+                align-items: center;
+                gap: 10px;
+            }
+
+            .sidebar-menu {
+                padding: 0 15px;
+            }
+
+            .menu-item {
+                display: block;
+                padding: 12px 20px;
+                color: rgba(255, 255, 255, 0.7);
+                text-decoration: none;
+                border-radius: 8px;
+                margin-bottom: 5px;
+                transition: all 0.3s ease;
+                display: flex;
+                align-items: center;
+                gap: 12px;
+                font-weight: 500;
+            }
+
+            .menu-item:hover {
+                background: rgba(255, 255, 255, 0.1);
+                color: var(--white);
+            }
+
+            .menu-item.active {
+                background: var(--primary);
+                color: var(--white);
+            }
+
+            .main-content {
+                margin-left: 260px;
+                padding: 30px;
+            }
+
+            .page-header {
+                background: var(--white);
+                padding: 25px 30px;
+                border-radius: 16px;
+                box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+                margin-bottom: 30px;
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+            }
+
+            .card {
+                background: var(--white);
+                border-radius: 16px;
+                box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+                margin-bottom: 25px;
+            }
+
+            .card-header {
+                background: var(--gray-light);
+                padding: 20px 25px;
+                border-bottom: 2px solid #e2e8f0;
+                font-weight: 600;
+                font-size: 16px;
+                color: var(--dark);
+                display: flex;
+                align-items: center;
+                gap: 10px;
+                border-radius: 16px 16px 0 0;
+            }
+
+            .card-body {
+                padding: 30px;
+            }
+
+            .form-label {
+                font-weight: 600;
+                color: var(--dark);
+                margin-bottom: 8px;
+                font-size: 14px;
+            }
+
+            .form-control, .form-select {
+                padding: 12px 16px;
+                border: 2px solid #e2e8f0;
+                border-radius: 10px;
+                font-size: 14px;
+                transition: all 0.3s ease;
+            }
+
+            .form-control:focus, .form-select:focus {
+                outline: none;
+                border-color: var(--primary);
+                box-shadow: 0 0 0 4px rgba(79, 70, 229, 0.1);
+            }
+
+            .form-check-input {
+                width: 20px;
+                height: 20px;
+                border: 2px solid #e2e8f0;
+                cursor: pointer;
+            }
+
+            .form-check-input:checked {
+                background-color: var(--primary);
+                border-color: var(--primary);
+            }
+
+            .form-check-label {
+                margin-left: 8px;
+                font-weight: 500;
+                cursor: pointer;
+            }
+
+            .btn-modern {
+                padding: 12px 24px;
+                border-radius: 10px;
+                font-weight: 600;
+                border: none;
+                cursor: pointer;
+                transition: all 0.3s ease;
+                display: inline-flex;
+                align-items: center;
+                gap: 8px;
+                text-decoration: none;
+                font-size: 14px;
+            }
+
+            .btn-primary {
+                background: var(--primary);
+                color: white;
+            }
+
+            .btn-primary:hover {
+                background: var(--primary-dark);
+                transform: translateY(-2px);
+                box-shadow: 0 4px 12px rgba(79, 70, 229, 0.4);
+            }
+
+            .btn-secondary {
+                background: var(--gray);
+                color: white;
+            }
+
+            .btn-secondary:hover {
+                background: #475569;
+            }
+
+            .btn-outline {
+                background: white;
+                color: var(--gray);
+                border: 2px solid #e2e8f0;
+            }
+
+            .btn-outline:hover {
+                border-color: var(--primary);
+                color: var(--primary);
+            }
+
+            .form-actions {
+                display: flex;
+                gap: 15px;
+                margin-top: 30px;
+                padding-top: 25px;
+                border-top: 2px solid var(--gray-light);
+            }
+
+            .alert {
+                padding: 15px 20px;
+                border-radius: 10px;
+                margin-bottom: 20px;
+                display: flex;
+                align-items: center;
+                gap: 10px;
+            }
+
+            .alert-success {
+                background: rgba(16, 185, 129, 0.1);
+                border-left: 4px solid var(--success);
+                color: var(--success);
+            }
+
+            .alert-error {
+                background: rgba(239, 68, 68, 0.1);
+                border-left: 4px solid var(--danger);
+                color: var(--danger);
+            }
+
+            .required-field::after {
+                content: " *";
+                color: var(--danger);
+            }
+        </style>
+    </head>
+    <body>
+        <!-- Sidebar -->
+        <nav class="sidebar">
+            <div class="sidebar-logo">
+                <h1><i class="bi bi-boxes"></i> InventaPro</h1>
             </div>
-            
-            <div class="mb-3">
-                <label>Nombre:</label>
-                <input type="text" class="form-control" th:field="*{nombre}" required>
+            <div class="sidebar-menu">
+                <a href="/dashboard" class="menu-item">
+                    <i class="bi bi-speedometer2"></i> Dashboard
+                </a>
+                <a href="/productos" class="menu-item">
+                    <i class="bi bi-box-seam"></i> Productos
+                </a>
+                <a href="/movimientos" class="menu-item">
+                    <i class="bi bi-arrow-left-right"></i> Movimientos
+                </a>
+                <a href="/almacenes" class="menu-item active">
+                    <i class="bi bi-building"></i> Almacenes
+                </a>
+                <a href="/proveedores" class="menu-item">
+                    <i class="bi bi-truck"></i> Proveedores
+                </a>
+                <a href="/clientes" class="menu-item">
+                    <i class="bi bi-people"></i> Clientes
+                </a>
+                <a href="/reportes" class="menu-item">
+                    <i class="bi bi-graph-up"></i> Reportes
+                </a>
+                <a href="/usuarios" class="menu-item">
+                    <i class="bi bi-person-gear"></i> Usuarios
+                </a>
+                <a href="/logout" class="menu-item">
+                    <i class="bi bi-box-arrow-right"></i> Cerrar Sesión
+                </a>
             </div>
-            
-            <div class="mb-3">
-                <label>Descripción:</label>
-                <textarea class="form-control" th:field="*{descripcion}"></textarea>
-            </div>
-            
-            <div class="mb-3">
-                <label>Dirección:</label>
-                <input type="text" class="form-control" th:field="*{direccion}">
-            </div>
-            
-            <div class="mb-3">
-                <label>Ciudad:</label>
-                <input type="text" class="form-control" th:field="*{ciudad}">
-            </div>
-            
-            <!-- Agregar en almacenes/formulario.html antes del botón guardar -->
-            <div class="form-check mb-3">
-                <input type="checkbox" class="form-check-input" id="activo" 
-                       th:field="*{activo}" checked>
-                <label class="form-check-label" for="activo">
-                    Almacén Activo
-                </label>
+        </nav>
+
+        <!-- Main Content -->
+        <div class="main-content">
+            <!-- Header -->
+            <div class="page-header">
+                <div>
+                    <h2>
+                        <i class="bi bi-building"></i> 
+                        <span th:text="${almacen.id != null} ? 'Editar Almacén' : 'Nuevo Almacén'">Formulario Almacén</span>
+                    </h2>
+                    <p style="color: var(--gray); margin: 5px 0 0 0;">Complete la información del almacén</p>
+                </div>
+                <a href="/almacenes" class="btn-modern btn-outline">
+                    <i class="bi bi-arrow-left"></i> Volver
+                </a>
             </div>
 
-            <!-- Para usuario responsable -->
-            <div class="mb-3">
-                <label>Usuario Responsable:</label>
-                <select class="form-control" name="usuarioResponsableId">
-                    <option value="">-- Seleccione --</option>
-                    <option th:each="u : ${usuarios}" 
-                            th:value="${u.id}" 
-                            th:text="${u.nombreCompleto}"
-                            th:selected="${almacen.usuarioResponsable != null and almacen.usuarioResponsable.id == u.id}">
-                    </option>
-                </select>
+            <!-- Mensajes -->
+            <div th:if="${mensaje}" class="alert" th:classappend="${tipo == 'success'} ? 'alert-success' : 'alert-error'">
+                <i class="bi" th:classappend="${tipo == 'success'} ? 'bi-check-circle-fill' : 'bi-exclamation-triangle-fill'"></i>
+                <span th:text="${mensaje}">Mensaje</span>
             </div>
-            
-            <button type="submit" class="btn btn-primary">Guardar</button>
-            <a href="/almacenes" class="btn btn-secondary">Cancelar</a>
-        </form>
-    </div>
-</body>
+
+            <!-- Formulario -->
+            <form th:action="${almacen.id != null} ? @{/almacenes/{id}(id=${almacen.id})} : @{/almacenes}" 
+                  method="post" 
+                  th:object="${almacen}">
+
+                <input type="hidden" th:field="*{id}">
+
+                <div class="card">
+                    <div class="card-header">
+                        <i class="bi bi-info-circle"></i> Información Básica
+                    </div>
+                    <div class="card-body">
+                        <div class="row g-3">
+                            <div class="col-md-6">
+                                <label class="form-label required-field">Código</label>
+                                <input type="text" 
+                                       class="form-control" 
+                                       th:field="*{codigo}" 
+                                       placeholder="Ej: ALM-001"
+                                       required>
+                                <small style="color: var(--gray); display: block; margin-top: 5px;">
+                                    Código único del almacén
+                                </small>
+                            </div>
+
+                            <div class="col-md-6">
+                                <label class="form-label required-field">Nombre</label>
+                                <input type="text" 
+                                       class="form-control" 
+                                       th:field="*{nombre}" 
+                                       placeholder="Ej: Almacén Central"
+                                       required>
+                            </div>
+
+                            <div class="col-12">
+                                <label class="form-label">Descripción</label>
+                                <textarea class="form-control" 
+                                          th:field="*{descripcion}" 
+                                          rows="3"
+                                          placeholder="Descripción del almacén (opcional)"></textarea>
+                            </div>
+
+                            <div class="col-md-6">
+                                <label class="form-label">Capacidad Máxima</label>
+                                <input type="number" 
+                                       class="form-control" 
+                                       th:field="*{capacidadMaxima}" 
+                                       step="0.01"
+                                       placeholder="0.00">
+                                <small style="color: var(--gray); display: block; margin-top: 5px;">
+                                    Capacidad en metros cúbicos (opcional)
+                                </small>
+                            </div>
+
+                            <div class="col-md-6">
+                                <label class="form-label">Usuario Responsable</label>
+                                <select class="form-select" name="usuarioResponsableId">
+                                    <option value="">-- Seleccione un usuario --</option>
+                                    <option th:each="u : ${usuarios}" 
+                                            th:value="${u.id}" 
+                                            th:text="${u.nombreCompleto}"
+                                            th:selected="${almacen.usuarioResponsable != null and almacen.usuarioResponsable.id == u.id}">
+                                    </option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <div class="card-header">
+                        <i class="bi bi-geo-alt"></i> Ubicación
+                    </div>
+                    <div class="card-body">
+                        <div class="row g-3">
+                            <div class="col-12">
+                                <label class="form-label">Dirección</label>
+                                <input type="text" 
+                                       class="form-control" 
+                                       th:field="*{direccion}" 
+                                       placeholder="Ej: Calle 123 #45-67">
+                            </div>
+
+                            <div class="col-md-6">
+                                <label class="form-label">Ciudad</label>
+                                <input type="text" 
+                                       class="form-control" 
+                                       th:field="*{ciudad}" 
+                                       placeholder="Ej: Bucaramanga">
+                            </div>
+
+                            <div class="col-md-6">
+                                <label class="form-label">País</label>
+                                <input type="text" 
+                                       class="form-control" 
+                                       th:field="*{pais}" 
+                                       placeholder="Ej: Colombia">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <div class="card-header">
+                        <i class="bi bi-gear"></i> Configuración
+                    </div>
+                    <div class="card-body">
+                        <div class="form-check">
+                            <input type="checkbox" 
+                                   class="form-check-input" 
+                                   id="activo" 
+                                   th:field="*{activo}">
+                            <label class="form-check-label" for="activo">
+                                <strong>Almacén Activo</strong>
+                                <small style="display: block; color: var(--gray); margin-top: 3px;">
+                                    Los almacenes inactivos no se mostrarán en los formularios
+                                </small>
+                            </label>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="form-actions">
+                    <button type="submit" class="btn-modern btn-primary">
+                        <i class="bi bi-check-circle"></i>
+                        <span th:text="${almacen.id != null} ? 'Actualizar' : 'Guardar'">Guardar</span>
+                    </button>
+                    <a href="/almacenes" class="btn-modern btn-secondary">
+                        <i class="bi bi-x-circle"></i> Cancelar
+                    </a>
+                </div>
+            </form>
+        </div>
+
+        <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    </body>
 </html>

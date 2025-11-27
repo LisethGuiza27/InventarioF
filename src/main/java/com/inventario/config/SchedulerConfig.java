@@ -13,7 +13,7 @@ public class SchedulerConfig {
 
     @Autowired
     private AlertaService alertaService;
-    
+
     @Autowired
     private UsuarioService usuarioService;
 

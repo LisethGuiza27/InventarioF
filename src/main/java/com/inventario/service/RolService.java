@@ -36,37 +36,37 @@ public class RolService {
         if (rol.getNombre() == null || rol.getNombre().trim().isEmpty()) {
             throw new Exception("El nombre del rol es obligatorio");
         }
-        
+
         if (repository.findByNombre(rol.getNombre()).isPresent()) {
             throw new Exception("El rol ya existe");
         }
-        
+
         return repository.save(rol);
     }
 
     public Rol actualizar(Integer id, Rol rol) throws Exception {
         Rol existente = repository.findById(id)
                 .orElseThrow(() -> new Exception("Rol no encontrado"));
-        
+
         if (rol.getDescripcion() != null) {
             existente.setDescripcion(rol.getDescripcion());
         }
         if (rol.getActivo() != null) {
             existente.setActivo(rol.getActivo());
         }
-        
+
         return repository.save(existente);
     }
 
     public void eliminar(Integer id) throws Exception {
         Rol rol = repository.findById(id)
                 .orElseThrow(() -> new Exception("Rol no encontrado"));
-        
+
         // Verificar que no tenga usuarios asignados
         if (!rol.getUsuarios().isEmpty()) {
             throw new Exception("No se puede eliminar un rol con usuarios asignados");
         }
-        
+
         rol.setActivo(false);
         repository.save(rol);
     }

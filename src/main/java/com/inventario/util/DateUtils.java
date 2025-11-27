@@ -9,5 +9,5 @@ package com.inventario.util;
  * @author Liseth
  */
 public class DateUtils {
-    
+
 }

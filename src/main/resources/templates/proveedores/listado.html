@@ -1,54 +1,421 @@
-<!-- src/main/resources/templates/proveedores/listado.html -->
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org">
-<head>
-    <meta charset="UTF-8">
-    <title>Proveedores</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
-</head>
-<body>
-    <div class="container mt-4">
-        <h2><i class="bi bi-truck"></i> Proveedores</h2>
-        
-        <a href="/proveedores/nuevo" class="btn btn-success mb-3">
-            <i class="bi bi-plus-circle"></i> Nuevo Proveedor
-        </a>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Proveedores - Sistema de Inventario</title>
+        <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+        <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
+        <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+        <style>
+            :root {
+                --primary: #4f46e5;
+                --primary-dark: #4338ca;
+                --success: #10b981;
+                --warning: #f59e0b;
+                --danger: #ef4444;
+                --info: #06b6d4;
+                --dark: #0f172a;
+                --gray: #64748b;
+                --gray-light: #f1f5f9;
+                --white: #ffffff;
+            }
 
-        <table class="table table-striped">
-            <thead>
-                <tr>
-                    <th>Código</th>
-                    <th>Nombre</th>
-                    <th>RUC</th>
-                    <th>Teléfono</th>
-                    <th>Email</th>
-                    <th>Acciones</th>
-                </tr>
-            </thead>
-            <tbody>
-                <tr th:each="p : ${proveedores}">
-                    <td th:text="${p.codigo}"></td>
-                    <td th:text="${p.nombre}"></td>
-                    <td th:text="${p.ruc}"></td>
-                    <td th:text="${p.telefono}"></td>
-                    <td th:text="${p.email}"></td>
-                    <td>
-                        <a th:href="@{/proveedores/{id}/editar(id=${p.id})}" class="btn btn-sm btn-primary">
-                            <i class="bi bi-pencil"></i> Editar
+            * {
+                margin: 0;
+                padding: 0;
+                box-sizing: border-box;
+            }
+
+            body {
+                font-family: 'Inter', sans-serif;
+                background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+                min-height: 100vh;
+            }
+
+            .sidebar {
+                position: fixed;
+                left: 0;
+                top: 0;
+                width: 260px;
+                height: 100vh;
+                background: var(--dark);
+                padding: 20px 0;
+                overflow-y: auto;
+                z-index: 1000;
+            }
+
+            .sidebar-logo {
+                padding: 0 25px 30px;
+                border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+                margin-bottom: 20px;
+            }
+
+            .sidebar-logo h1 {
+                color: var(--white);
+                font-size: 24px;
+                font-weight: 700;
+                display: flex;
+                align-items: center;
+                gap: 10px;
+            }
+
+            .sidebar-menu {
+                padding: 0 15px;
+            }
+
+            .menu-item {
+                display: block;
+                padding: 12px 20px;
+                color: rgba(255, 255, 255, 0.7);
+                text-decoration: none;
+                border-radius: 8px;
+                margin-bottom: 5px;
+                transition: all 0.3s ease;
+                display: flex;
+                align-items: center;
+                gap: 12px;
+                font-weight: 500;
+            }
+
+            .menu-item:hover {
+                background: rgba(255, 255, 255, 0.1);
+                color: var(--white);
+            }
+
+            .menu-item.active {
+                background: var(--primary);
+                color: var(--white);
+            }
+
+            .main-content {
+                margin-left: 260px;
+                padding: 30px;
+            }
+
+            .page-header {
+                background: var(--white);
+                padding: 25px 30px;
+                border-radius: 16px;
+                box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+                margin-bottom: 30px;
+            }
+
+            .card {
+                background: var(--white);
+                border-radius: 16px;
+                box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+                margin-bottom: 25px;
+            }
+
+            .card-header {
+                background: var(--gray-light);
+                padding: 20px 25px;
+                border-bottom: 2px solid #e2e8f0;
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+            }
+
+            .btn-modern {
+                padding: 10px 20px;
+                border-radius: 10px;
+                font-weight: 600;
+                border: none;
+                cursor: pointer;
+                transition: all 0.3s ease;
+                display: inline-flex;
+                align-items: center;
+                gap: 8px;
+                text-decoration: none;
+                font-size: 14px;
+            }
+
+            .btn-primary {
+                background: var(--primary);
+                color: white;
+            }
+
+            .btn-primary:hover {
+                background: var(--primary-dark);
+                color: white;
+            }
+
+            .btn-success {
+                background: var(--success);
+                color: white;
+            }
+
+            .btn-success:hover {
+                background: #059669;
+                color: white;
+            }
+
+            .btn-info {
+                background: var(--info);
+                color: white;
+            }
+
+            .btn-danger {
+                background: var(--danger);
+                color: white;
+            }
+
+            .btn-sm {
+                padding: 6px 12px;
+                font-size: 13px;
+            }
+
+            .modern-table {
+                width: 100%;
+                border-collapse: separate;
+                border-spacing: 0;
+            }
+
+            .modern-table thead th {
+                background: var(--gray-light);
+                padding: 16px;
+                font-size: 13px;
+                font-weight: 600;
+                text-transform: uppercase;
+                letter-spacing: 0.5px;
+                color: var(--gray);
+                text-align: left;
+                border-bottom: 2px solid #e2e8f0;
+            }
+
+            .modern-table tbody td {
+                padding: 16px;
+                border-bottom: 1px solid #f1f5f9;
+                font-size: 14px;
+            }
+
+            .modern-table tbody tr:hover {
+                background: rgba(79, 70, 229, 0.02);
+            }
+
+            .badge {
+                padding: 6px 12px;
+                border-radius: 6px;
+                font-size: 12px;
+                font-weight: 600;
+                display: inline-block;
+            }
+
+            .badge-success {
+                background: rgba(16, 185, 129, 0.1);
+                color: var(--success);
+            }
+
+            .badge-danger {
+                background: rgba(239, 68, 68, 0.1);
+                color: var(--danger);
+            }
+
+            .search-box {
+                display: flex;
+                gap: 10px;
+                margin-bottom: 20px;
+            }
+
+            .form-control {
+                padding: 10px 15px;
+                border: 2px solid #e2e8f0;
+                border-radius: 8px;
+                font-size: 14px;
+            }
+
+            .form-control:focus {
+                outline: none;
+                border-color: var(--primary);
+                box-shadow: 0 0 0 4px rgba(79, 70, 229, 0.1);
+            }
+
+            .alert {
+                padding: 15px 20px;
+                border-radius: 10px;
+                margin-bottom: 20px;
+                display: flex;
+                align-items: center;
+                gap: 10px;
+            }
+
+            .alert-success {
+                background: rgba(16, 185, 129, 0.1);
+                border-left: 4px solid var(--success);
+                color: var(--success);
+            }
+
+            .alert-error {
+                background: rgba(239, 68, 68, 0.1);
+                border-left: 4px solid var(--danger);
+                color: var(--danger);
+            }
+
+            .action-buttons {
+                display: flex;
+                gap: 5px;
+                flex-wrap: wrap;
+            }
+
+            .empty-state {
+                text-align: center;
+                padding: 60px 20px;
+                color: var(--gray);
+            }
+
+            .empty-state i {
+                font-size: 64px;
+                margin-bottom: 20px;
+                opacity: 0.3;
+            }
+        </style>
+    </head>
+    <body>
+        <!-- Sidebar -->
+        <nav class="sidebar">
+            <div class="sidebar-logo">
+                <h1><i class="bi bi-boxes"></i> InventaPro</h1>
+            </div>
+            <div class="sidebar-menu">
+                <a href="/dashboard" class="menu-item">
+                    <i class="bi bi-speedometer2"></i> Dashboard
+                </a>
+                <a href="/productos" class="menu-item">
+                    <i class="bi bi-box-seam"></i> Productos
+                </a>
+                <a href="/movimientos" class="menu-item">
+                    <i class="bi bi-arrow-left-right"></i> Movimientos
+                </a>
+                <a href="/almacenes" class="menu-item">
+                    <i class="bi bi-building"></i> Almacenes
+                </a>
+                <a href="/proveedores" class="menu-item active">
+                    <i class="bi bi-truck"></i> Proveedores
+                </a>
+                <a href="/clientes" class="menu-item">
+                    <i class="bi bi-people"></i> Clientes
+                </a>
+                <a href="/reportes" class="menu-item">
+                    <i class="bi bi-graph-up"></i> Reportes
+                </a>
+                <a href="/usuarios" class="menu-item">
+                    <i class="bi bi-person-gear"></i> Usuarios
+                </a>
+                <a href="/logout" class="menu-item">
+                    <i class="bi bi-box-arrow-right"></i> Cerrar Sesión
+                </a>
+            </div>
+        </nav>
+
+        <!-- Main Content -->
+        <div class="main-content">
+            <div class="page-header">
+                <h2><i class="bi bi-truck"></i> Proveedores</h2>
+                <p style="color: var(--gray); margin: 5px 0 0 0;">Gestiona tus proveedores y contactos comerciales</p>
+            </div>
+
+            <!-- Mensajes -->
+            <div th:if="${mensaje}" class="alert" th:classappend="${tipo == 'success'} ? 'alert-success' : 'alert-error'">
+                <i class="bi" th:classappend="${tipo == 'success'} ? 'bi-check-circle-fill' : 'bi-exclamation-triangle-fill'"></i>
+                <span th:text="${mensaje}">Mensaje</span>
+            </div>
+
+            <!-- Búsqueda y Acciones -->
+            <div class="search-box">
+                <form method="get" action="/proveedores" style="flex: 1; display: flex; gap: 10px;">
+                    <input type="text" 
+                           name="buscar" 
+                           class="form-control" 
+                           placeholder="Buscar por código, nombre, RFC, email..."
+                           th:value="${buscar}"
+                           style="flex: 1;">
+                    <button type="submit" class="btn-modern btn-primary">
+                        <i class="bi bi-search"></i> Buscar
+                    </button>
+                </form>
+                <a href="/proveedores/nuevo" class="btn-modern btn-success">
+                    <i class="bi bi-plus-circle"></i> Nuevo Proveedor
+                </a>
+            </div>
+
+            <!-- Tabla de Proveedores -->
+            <div class="card">
+                <div style="padding: 0;">
+                    <table class="modern-table" th:if="${proveedores != null and !proveedores.isEmpty()}">
+                        <thead>
+                            <tr>
+                                <th>Código</th>
+                                <th>Razón Social</th>
+                                <th>Nombre Comercial</th>
+                                <th>RFC</th>
+                                <th>Teléfono</th>
+                                <th>Email</th>
+                                <th>Estado</th>
+                                <th>Acciones</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr th:each="p : ${proveedores}">
+                                <td>
+                                    <strong style="color: var(--primary);" th:text="${p.codigo}">PROV-001</strong>
+                                </td>
+                                <td>
+                                    <strong th:text="${p.razonSocial}">Proveedor SA</strong>
+                                </td>
+                                <td th:text="${p.nombreComercial ?: '-'}">Nombre Comercial</td>
+                                <td th:text="${p.rfc ?: '-'}">RFC</td>
+                                <td>
+                                    <!-- ✅ CORRECCIÓN: Sintaxis correcta para verificar strings vacíos -->
+                                    <span th:if="${p.telefono != null and !#strings.isEmpty(p.telefono)}" 
+                                          th:text="${p.telefono}">Teléfono</span>
+                                    <span th:if="${(p.telefono == null or #strings.isEmpty(p.telefono)) and p.celular != null and !#strings.isEmpty(p.celular)}" 
+                                          th:text="${p.celular}">Celular</span>
+                                    <span th:if="${(p.telefono == null or #strings.isEmpty(p.telefono)) and (p.celular == null or #strings.isEmpty(p.celular))}">-</span>
+                                </td>
+                                <td th:text="${p.email ?: '-'}">email@ejemplo.com</td>
+                                <td>
+                                    <span class="badge" 
+                                          th:classappend="${p.activo} ? 'badge-success' : 'badge-danger'"
+                                          th:text="${p.activo} ? 'Activo' : 'Inactivo'">
+                                        Activo
+                                    </span>
+                                </td>
+                                <td>
+                                    <div class="action-buttons">
+                                        <a th:href="@{/proveedores/{id}/detalle(id=${p.id})}" 
+                                           class="btn-modern btn-info btn-sm">
+                                            <i class="bi bi-eye"></i> Ver
+                                        </a>
+                                        <a th:href="@{/proveedores/{id}/editar(id=${p.id})}" 
+                                           class="btn-modern btn-primary btn-sm">
+                                            <i class="bi bi-pencil"></i> Editar
+                                        </a>
+                                        <a th:href="@{/proveedores/{id}/eliminar(id=${p.id})}" 
+                                           class="btn-modern btn-danger btn-sm"
+                                           onclick="return confirm('¿Está seguro de desactivar este proveedor?')">
+                                            <i class="bi bi-trash"></i> Desactivar
+                                        </a>
+                                    </div>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+
+                    <!-- Estado vacío -->
+                    <div class="empty-state" th:if="${proveedores == null or proveedores.isEmpty()}">
+                        <i class="bi bi-truck"></i>
+                        <h4>No hay proveedores registrados</h4>
+                        <p th:if="${buscar}">No se encontraron resultados para: "<span th:text="${buscar}"></span>"</p>
+                        <p th:if="${!buscar}">Comienza agregando tu primer proveedor</p>
+                        <a href="/proveedores/nuevo" class="btn-modern btn-success" style="margin-top: 20px;">
+                            <i class="bi bi-plus-circle"></i> Agregar Proveedor
                         </a>
-                        <a th:href="@{/proveedores/{id}/detalle(id=${p.id})}" class="btn btn-sm btn-info">
-                            <i class="bi bi-eye"></i> Ver
-                        </a>
-                        <a th:href="@{/proveedores/{id}/eliminar(id=${p.id})}" 
-                           class="btn btn-sm btn-danger"
-                           onclick="return confirm('¿Desea desactivar este proveedor?')">
-                            <i class="bi bi-trash"></i> Desactivar
-                        </a>
-                    </td>
-                </tr>
-            </tbody>
-        </table>
-    </div>
-</body>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    </body>
 </html>
