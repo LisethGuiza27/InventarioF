@@ -103,10 +103,17 @@ public class AlmacenController {
     @GetMapping("/{id}/eliminar")
     public String eliminar(@PathVariable Integer id, RedirectAttributes redirect) {
         try {
+            System.out.println("=== ELIMINAR ALMACÉN ===");
+            System.out.println("ID: " + id);
+            
             service.eliminar(id);
-            redirect.addFlashAttribute("mensaje", "Almacén eliminado exitosamente");
+            
+            redirect.addFlashAttribute("mensaje", "Almacén desactivado exitosamente");
             redirect.addFlashAttribute("tipo", "success");
         } catch (Exception e) {
+            e.printStackTrace();
+            System.err.println("Error al desactivar almacén: " + e.getMessage());
+            
             redirect.addFlashAttribute("mensaje", "Error: " + e.getMessage());
             redirect.addFlashAttribute("tipo", "error");
         }

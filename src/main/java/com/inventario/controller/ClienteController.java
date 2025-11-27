@@ -32,7 +32,9 @@ public class ClienteController {
             model.addAttribute("clientes", clientes);
             return "clientes/listado";
         } catch (Exception e) {
+            e.printStackTrace();
             model.addAttribute("error", "Error al cargar clientes: " + e.getMessage());
+            model.addAttribute("clientes", List.of());
             return "clientes/listado";
         }
     }
@@ -44,47 +46,49 @@ public class ClienteController {
     }
 
     @PostMapping
-public String crear(@Valid @ModelAttribute Cliente cliente,
-                   BindingResult result,
-                   RedirectAttributes redirect,
-                   Model model) {
-    
-    System.out.println("=== CREAR CLIENTE ===");
-    System.out.println("Código: " + cliente.getCodigo());
-    System.out.println("Nombre: " + cliente.getNombre());
-    
-    if (result.hasErrors()) {
-        System.out.println("Errores de validación:");
-        result.getAllErrors().forEach(error -> 
-            System.out.println("- " + error.getDefaultMessage())
-        );
-        return "clientes/formulario";
+    public String crear(@Valid @ModelAttribute Cliente cliente,
+                       BindingResult result,
+                       RedirectAttributes redirect) {
+        
+        System.out.println("=== CREAR CLIENTE ===");
+        System.out.println("Código: " + cliente.getCodigo());
+        System.out.println("Nombre: " + cliente.getNombre());
+        
+        if (result.hasErrors()) {
+            System.out.println("Errores de validación:");
+            result.getAllErrors().forEach(error -> 
+                System.out.println("- " + error.getDefaultMessage())
+            );
+            redirect.addFlashAttribute("mensaje", "Error de validación");
+            redirect.addFlashAttribute("tipo", "error");
+            return "redirect:/clientes/nuevo";
+        }
+        
+        try {
+            // Inicializar valores por defecto si son null
+            if (cliente.getDiasCredito() == null) cliente.setDiasCredito(0);
+            if (cliente.getLimiteCredito() == null) cliente.setLimiteCredito(0.0);
+            if (cliente.getSaldoActual() == null) cliente.setSaldoActual(0.0);
+            if (cliente.getDescuentoGeneral() == null) cliente.setDescuentoGeneral(0.0);
+            if (cliente.getPais() == null || cliente.getPais().isEmpty()) cliente.setPais("México");
+            
+            Cliente clienteGuardado = service.crear(cliente);
+            
+            System.out.println("Cliente guardado exitosamente con ID: " + clienteGuardado.getId());
+            
+            redirect.addFlashAttribute("mensaje", "Cliente creado exitosamente");
+            redirect.addFlashAttribute("tipo", "success");
+            return "redirect:/clientes";
+            
+        } catch (Exception e) {
+            e.printStackTrace();
+            System.err.println("Error al guardar cliente: " + e.getMessage());
+            
+            redirect.addFlashAttribute("mensaje", "Error: " + e.getMessage());
+            redirect.addFlashAttribute("tipo", "error");
+            return "redirect:/clientes/nuevo";
+        }
     }
-    
-    try {
-        // Inicializar valores por defecto
-        if (cliente.getDiasCredito() == null) cliente.setDiasCredito(0);
-        if (cliente.getLimiteCredito() == null) cliente.setLimiteCredito(0.0);
-        if (cliente.getSaldoPendiente() == null) cliente.setSaldoPendiente(0.0);
-        if (cliente.getTotalCompras() == null) cliente.setTotalCompras(0.0);
-        
-        Cliente clienteGuardado = service.crear(cliente);
-        
-        System.out.println("Cliente guardado exitosamente con ID: " + clienteGuardado.getId());
-        
-        redirect.addFlashAttribute("mensaje", "Cliente creado exitosamente");
-        redirect.addFlashAttribute("tipo", "success");
-        return "redirect:/clientes";
-        
-    } catch (Exception e) {
-        e.printStackTrace();
-        System.err.println("Error al guardar cliente: " + e.getMessage());
-        
-        redirect.addFlashAttribute("mensaje", "Error: " + e.getMessage());
-        redirect.addFlashAttribute("tipo", "error");
-        return "redirect:/clientes/nuevo";
-    }
-}
 
     @GetMapping("/{id}/editar")
     public String editarForm(@PathVariable Integer id, Model model, RedirectAttributes redirect) {
@@ -106,7 +110,9 @@ public String crear(@Valid @ModelAttribute Cliente cliente,
                             BindingResult result,
                             RedirectAttributes redirect) {
         if (result.hasErrors()) {
-            return "clientes/formulario";
+            redirect.addFlashAttribute("mensaje", "Error de validación");
+            redirect.addFlashAttribute("tipo", "error");
+            return "redirect:/clientes/" + id + "/editar";
         }
         
         try {
@@ -124,7 +130,7 @@ public String crear(@Valid @ModelAttribute Cliente cliente,
     public String eliminar(@PathVariable Integer id, RedirectAttributes redirect) {
         try {
             service.eliminar(id);
-            redirect.addFlashAttribute("mensaje", "Cliente eliminado exitosamente");
+            redirect.addFlashAttribute("mensaje", "Cliente desactivado exitosamente");
             redirect.addFlashAttribute("tipo", "success");
         } catch (Exception e) {
             redirect.addFlashAttribute("mensaje", "Error: " + e.getMessage());

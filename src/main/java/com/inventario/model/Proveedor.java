@@ -1,6 +1,8 @@
 package com.inventario.model;
 
 import jakarta.persistence.*;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Size;
 import java.time.LocalDateTime;
 
 @Entity
@@ -11,52 +13,67 @@ public class Proveedor {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
     
-    @Column(nullable = false, length = 20)
+    @NotBlank(message = "El código es obligatorio")
+    @Size(min = 3, max = 30)
+    @Column(nullable = false, unique = true, length = 30)
     private String codigo;
     
-    @Column(nullable = false, length = 200)
-    private String nombre;
-    
-    @Column(name = "razon_social", length = 200)
+    @NotBlank(message = "La razón social es obligatoria")
+    @Column(name = "razon_social", nullable = false, length = 200)
     private String razonSocial;
     
-    @Column(length = 20)
-    private String ruc;
-    
-    @Column(length = 300)
-    private String direccion;
+    @Column(name = "nombre_comercial", length = 150)
+    private String nombreComercial;
     
     @Column(length = 20)
-    private String telefono;
+    private String rfc;
     
     @Column(length = 100)
     private String email;
     
-    @Column(name = "persona_contacto", length = 150)
-    private String personaContacto;
+    @Column(length = 20)
+    private String telefono;
     
-    @Column(name = "telefono_contacto", length = 20)
-    private String telefonoContacto;
+    @Column(length = 20)
+    private String celular;
     
-    @Column(length = 100)
-    private String pais;
+    @Column(columnDefinition = "TEXT")
+    private String direccion;
     
     @Column(length = 100)
     private String ciudad;
     
+    @Column(length = 100)
+    private String estado;
+    
     @Column(name = "codigo_postal", length = 10)
     private String codigoPostal;
+    
+    @Column(length = 50)
+    private String pais = "México";
+    
+    @Column(name = "contacto_nombre", length = 150)
+    private String contactoNombre;
+    
+    @Column(name = "contacto_cargo", length = 100)
+    private String contactoCargo;
+    
+    @Column(name = "contacto_email", length = 100)
+    private String contactoEmail;
+    
+    @Column(name = "contacto_telefono", length = 20)
+    private String contactoTelefono;
     
     @Column(name = "dias_credito")
     private Integer diasCredito = 0;
     
-    @Column(name = "limite_credito")
+    @Column(name = "limite_credito", precision = 15, scale = 2)
     private Double limiteCredito = 0.0;
     
-    @Column(name = "saldo_pendiente")
-    private Double saldoPendiente = 0.0;
+    @Column(precision = 1, scale = 0)
+    private Integer calificacion = 5;
     
-    @Column(length = 500)
+    @Column(columnDefinition = "TEXT")
     private String notas;
     
     @Column(nullable = false)
@@ -82,183 +99,92 @@ public class Proveedor {
     // Constructores
     public Proveedor() {}
     
-    public Proveedor(String codigo, String nombre, String telefono, String email) {
+    public Proveedor(String codigo, String razonSocial) {
         this.codigo = codigo;
-        this.nombre = nombre;
-        this.telefono = telefono;
-        this.email = email;
-    }
-    
-    // Getters y Setters completos
-    public Integer getId() {
-        return id;
-    }
-    
-    public void setId(Integer id) {
-        this.id = id;
-    }
-    
-    public String getCodigo() {
-        return codigo;
-    }
-    
-    public void setCodigo(String codigo) {
-        this.codigo = codigo;
-    }
-    
-    public String getNombre() {
-        return nombre;
-    }
-    
-    public void setNombre(String nombre) {
-        this.nombre = nombre;
-    }
-    
-    public String getRazonSocial() {
-        return razonSocial;
-    }
-    
-    public void setRazonSocial(String razonSocial) {
         this.razonSocial = razonSocial;
     }
     
-    public String getRuc() {
-        return ruc;
+    // Getters y Setters
+    public Integer getId() { return id; }
+    public void setId(Integer id) { this.id = id; }
+    
+    public String getCodigo() { return codigo; }
+    public void setCodigo(String codigo) { this.codigo = codigo; }
+    
+    public String getRazonSocial() { return razonSocial; }
+    public void setRazonSocial(String razonSocial) { this.razonSocial = razonSocial; }
+    
+    public String getNombreComercial() { return nombreComercial; }
+    public void setNombreComercial(String nombreComercial) { this.nombreComercial = nombreComercial; }
+    
+    // Método helper para mantener compatibilidad
+    public String getNombre() {
+        return nombreComercial != null ? nombreComercial : razonSocial;
     }
     
-    public void setRuc(String ruc) {
-        this.ruc = ruc;
+    public void setNombre(String nombre) {
+        this.nombreComercial = nombre;
     }
     
-    public String getDireccion() {
-        return direccion;
-    }
+    public String getRfc() { return rfc; }
+    public void setRfc(String rfc) { this.rfc = rfc; }
     
-    public void setDireccion(String direccion) {
-        this.direccion = direccion;
-    }
+    public String getEmail() { return email; }
+    public void setEmail(String email) { this.email = email; }
     
-    public String getTelefono() {
-        return telefono;
-    }
+    public String getTelefono() { return telefono; }
+    public void setTelefono(String telefono) { this.telefono = telefono; }
     
-    public void setTelefono(String telefono) {
-        this.telefono = telefono;
-    }
+    public String getCelular() { return celular; }
+    public void setCelular(String celular) { this.celular = celular; }
     
-    public String getEmail() {
-        return email;
-    }
+    public String getDireccion() { return direccion; }
+    public void setDireccion(String direccion) { this.direccion = direccion; }
     
-    public void setEmail(String email) {
-        this.email = email;
-    }
+    public String getCiudad() { return ciudad; }
+    public void setCiudad(String ciudad) { this.ciudad = ciudad; }
     
-    public String getPersonaContacto() {
-        return personaContacto;
-    }
+    public String getEstado() { return estado; }
+    public void setEstado(String estado) { this.estado = estado; }
     
-    public void setPersonaContacto(String personaContacto) {
-        this.personaContacto = personaContacto;
-    }
+    public String getCodigoPostal() { return codigoPostal; }
+    public void setCodigoPostal(String codigoPostal) { this.codigoPostal = codigoPostal; }
     
-    public String getTelefonoContacto() {
-        return telefonoContacto;
-    }
+    public String getPais() { return pais; }
+    public void setPais(String pais) { this.pais = pais; }
     
-    public void setTelefonoContacto(String telefonoContacto) {
-        this.telefonoContacto = telefonoContacto;
-    }
+    public String getContactoNombre() { return contactoNombre; }
+    public void setContactoNombre(String contactoNombre) { this.contactoNombre = contactoNombre; }
     
-    public String getPais() {
-        return pais;
-    }
+    public String getContactoCargo() { return contactoCargo; }
+    public void setContactoCargo(String contactoCargo) { this.contactoCargo = contactoCargo; }
     
-    public void setPais(String pais) {
-        this.pais = pais;
-    }
+    public String getContactoEmail() { return contactoEmail; }
+    public void setContactoEmail(String contactoEmail) { this.contactoEmail = contactoEmail; }
     
-    public String getCiudad() {
-        return ciudad;
-    }
+    public String getContactoTelefono() { return contactoTelefono; }
+    public void setContactoTelefono(String contactoTelefono) { this.contactoTelefono = contactoTelefono; }
     
-    public void setCiudad(String ciudad) {
-        this.ciudad = ciudad;
-    }
+    public Integer getDiasCredito() { return diasCredito; }
+    public void setDiasCredito(Integer diasCredito) { this.diasCredito = diasCredito; }
     
-    public String getCodigoPostal() {
-        return codigoPostal;
-    }
+    public Double getLimiteCredito() { return limiteCredito; }
+    public void setLimiteCredito(Double limiteCredito) { this.limiteCredito = limiteCredito; }
     
-    public void setCodigoPostal(String codigoPostal) {
-        this.codigoPostal = codigoPostal;
-    }
+    public Integer getCalificacion() { return calificacion; }
+    public void setCalificacion(Integer calificacion) { this.calificacion = calificacion; }
     
-    public Integer getDiasCredito() {
-        return diasCredito;
-    }
+    public String getNotas() { return notas; }
+    public void setNotas(String notas) { this.notas = notas; }
     
-    public void setDiasCredito(Integer diasCredito) {
-        this.diasCredito = diasCredito;
-    }
+    public Boolean getActivo() { return activo; }
+    public void setActivo(Boolean activo) { this.activo = activo; }
     
-    public Double getLimiteCredito() {
-        return limiteCredito;
-    }
-    
-    public void setLimiteCredito(Double limiteCredito) {
-        this.limiteCredito = limiteCredito;
-    }
-    
-    public Double getSaldoPendiente() {
-        return saldoPendiente;
-    }
-    
-    public void setSaldoPendiente(Double saldoPendiente) {
-        this.saldoPendiente = saldoPendiente;
-    }
-    
-    public String getNotas() {
-        return notas;
-    }
-    
-    public void setNotas(String notas) {
-        this.notas = notas;
-    }
-    
-    public Boolean getActivo() {
-        return activo;
-    }
-    
-    public void setActivo(Boolean activo) {
-        this.activo = activo;
-    }
-    
-    public LocalDateTime getCreatedAt() {
-        return createdAt;
-    }
-    
-    public LocalDateTime getUpdatedAt() {
-        return updatedAt;
-    }
-    
-    // Métodos de utilidad
-    public boolean tieneCreditoDisponible() {
-        return limiteCredito > saldoPendiente;
-    }
-    
-    public Double getCreditoDisponible() {
-        return Math.max(0, limiteCredito - saldoPendiente);
-    }
+    public LocalDateTime getCreatedAt() { return createdAt; }
+    public LocalDateTime getUpdatedAt() { return updatedAt; }
     
     @Override
     public String toString() {
-        return "Proveedor{" +
-                "id=" + id +
-                ", codigo='" + codigo + '\'' +
-                ", nombre='" + nombre + '\'' +
-                ", email='" + email + '\'' +
-                ", activo=" + activo +
-                '}';
+        return "Proveedor{id=" + id + ", codigo='" + codigo + "', razonSocial='" + razonSocial + "'}";
     }
 }
