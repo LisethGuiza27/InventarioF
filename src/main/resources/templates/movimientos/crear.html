@@ -18,11 +18,7 @@
             --white: #ffffff;
         }
 
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
 
         body {
             font-family: 'Inter', sans-serif;
@@ -57,9 +53,7 @@
             gap: 10px;
         }
 
-        .sidebar-menu {
-            padding: 0 15px;
-        }
+        .sidebar-menu { padding: 0 15px; }
 
         .menu-item {
             display: block;
@@ -95,6 +89,12 @@
             border-radius: 16px;
             box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
             overflow: hidden;
+            animation: slideIn 0.4s ease;
+        }
+
+        @keyframes slideIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
         }
 
         .form-header {
@@ -111,9 +111,7 @@
             background: linear-gradient(135deg, var(--danger), #dc2626);
         }
 
-        .form-body {
-            padding: 40px;
-        }
+        .form-body { padding: 40px; }
 
         .section-title {
             font-size: 18px;
@@ -158,25 +156,10 @@
             text-decoration: none;
         }
 
-        .btn-primary {
-            background: var(--primary);
-            color: white;
-        }
-
-        .btn-success {
-            background: var(--success);
-            color: white;
-        }
-
-        .btn-danger {
-            background: var(--danger);
-            color: white;
-        }
-
-        .btn-secondary {
-            background: var(--gray);
-            color: white;
-        }
+        .btn-primary { background: var(--primary); color: white; }
+        .btn-success { background: var(--success); color: white; }
+        .btn-danger { background: var(--danger); color: white; }
+        .btn-secondary { background: var(--gray); color: white; }
 
         .btn-modern:hover {
             transform: translateY(-2px);
@@ -239,6 +222,27 @@
             font-size: 32px;
             font-weight: 700;
         }
+
+        .alert {
+            padding: 12px 16px;
+            border-radius: 8px;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .alert-warning {
+            background: #fef3c7;
+            color: #92400e;
+            border: 1px solid #fde68a;
+        }
+
+        .alert-danger {
+            background: #fee2e2;
+            color: #991b1b;
+            border: 1px solid #fecaca;
+        }
     </style>
 </head>
 <body>
@@ -295,6 +299,7 @@
             </div>
 
             <div class="form-body">
+                <!-- CORRECCIÓN CRÍTICA: Cambiar action según el tipo -->
                 <form th:action="${tipo == 'ENTRADA'} ? @{/movimientos/entrada} : @{/movimientos/salida}" 
                       method="post" id="movimientoForm">
                     
@@ -306,7 +311,7 @@
                     <div class="row">
                         <div class="col-md-4 mb-3">
                             <label class="form-label">Almacén <span style="color: var(--danger);">*</span></label>
-                            <select class="form-select" name="almacen.id" required>
+                            <select class="form-select" name="almacen.id" id="almacenSelect" required>
                                 <option value="">-- Seleccione --</option>
                                 <option th:each="almacen : ${almacenes}" 
                                         th:value="${almacen.id}" 
@@ -321,7 +326,7 @@
                                 <option value="">-- Seleccione --</option>
                                 <option th:each="prov : ${proveedores}" 
                                         th:value="${prov.id}" 
-                                        th:text="${prov.nombre}">
+                                        th:text="${prov.razonSocial}">
                                 </option>
                             </select>
                         </div>
@@ -355,6 +360,12 @@
                         <i class="bi bi-list-check"></i> Detalle de Productos
                     </div>
 
+                    <!-- Mensaje de advertencia para salidas -->
+                    <div th:if="${tipo == 'SALIDA'}" class="alert alert-warning">
+                        <i class="bi bi-exclamation-triangle"></i>
+                        <span>Verifica que haya stock suficiente antes de agregar productos</span>
+                    </div>
+
                     <div class="row mb-3">
                         <div class="col-md-5">
                             <label class="form-label">Producto</label>
@@ -363,19 +374,27 @@
                                 <option th:each="prod : ${productos}" 
                                         th:value="${prod.id}" 
                                         th:text="${prod.codigo + ' - ' + prod.nombre}"
-                                        th:attr="data-precio=${prod.precioVenta}, data-stock=${prod.stockActual}">
+                                        th:attr="data-precio=${prod.precioVenta}, 
+                                                 data-precio-compra=${prod.precioCompra}, 
+                                                 data-stock=${prod.stockActual},
+                                                 data-nombre=${prod.nombre}">
                                 </option>
                             </select>
                         </div>
-                        <div class="col-md-3">
+                        <div class="col-md-2">
                             <label class="form-label">Cantidad</label>
                             <input type="number" class="form-control" id="inputCantidad" 
                                    min="1" value="1" placeholder="Cantidad">
                         </div>
-                        <div class="col-md-3">
-                            <label class="form-label">Precio Unitario</label>
+                        <div class="col-md-2">
+                            <label class="form-label">Precio Unit.</label>
                             <input type="number" class="form-control" id="inputPrecio" 
                                    step="0.01" min="0" placeholder="0.00">
+                        </div>
+                        <div class="col-md-2">
+                            <label class="form-label">Subtotal</label>
+                            <input type="text" class="form-control" id="inputSubtotal" 
+                                   readonly style="background: #f1f5f9;" value="0.00">
                         </div>
                         <div class="col-md-1">
                             <label class="form-label">&nbsp;</label>
@@ -384,6 +403,11 @@
                                 <i class="bi bi-plus"></i>
                             </button>
                         </div>
+                    </div>
+
+                    <!-- Stock disponible para salidas -->
+                    <div th:if="${tipo == 'SALIDA'}" id="stockInfo" style="display: none; padding: 10px; background: #fef3c7; border-radius: 8px; margin-bottom: 15px;">
+                        <small><i class="bi bi-info-circle"></i> Stock disponible: <strong id="stockDisponible">0</strong> unidades</small>
                     </div>
 
                     <table class="detalle-table" id="tablaDetalle">
@@ -405,9 +429,15 @@
                         </tbody>
                     </table>
 
+                    <!-- Campo oculto para enviar el JSON de detalles -->
+                    <input type="hidden" name="detallesJson" id="detallesJson">
+
                     <div class="total-box">
                         <div class="total-label">TOTAL</div>
                         <div class="total-value">$<span id="totalGeneral">0.00</span></div>
+                        <div style="margin-top: 10px; opacity: 0.8;">
+                            <span id="totalItems">0</span> productos - <span id="totalUnidades">0</span> unidades
+                        </div>
                     </div>
 
                     <!-- Acciones -->
@@ -416,7 +446,8 @@
                             <i class="bi bi-x-circle"></i> Cancelar
                         </a>
                         <button type="submit" class="btn-modern" 
-                                th:classappend="${tipo == 'ENTRADA'} ? 'btn-success' : 'btn-danger'">
+                                th:classappend="${tipo == 'ENTRADA'} ? 'btn-success' : 'btn-danger'"
+                                id="btnGuardar">
                             <i class="bi bi-save"></i> Guardar Movimiento
                         </button>
                     </div>
@@ -425,19 +456,45 @@
         </div>
     </div>
 
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-    <script>
+    <script th:inline="javascript">
+        /*<![CDATA[*/
+        const tipoMovimiento = /*[[${tipo}]]*/ 'ENTRADA';
         let detalles = [];
         let contadorDetalle = 0;
 
-        // Cuando se selecciona un producto, cargar su precio
+        // Cuando se selecciona un producto
         document.getElementById('selectProducto').addEventListener('change', function() {
             const option = this.options[this.selectedIndex];
-            const precio = option.getAttribute('data-precio');
-            if (precio) {
-                document.getElementById('inputPrecio').value = precio;
+            if (!option.value) return;
+
+            const precioVenta = parseFloat(option.getAttribute('data-precio')) || 0;
+            const precioCompra = parseFloat(option.getAttribute('data-precio-compra')) || 0;
+            const stock = parseInt(option.getAttribute('data-stock')) || 0;
+
+            // Para ENTRADAS usar precio de compra, para SALIDAS usar precio de venta
+            const precioDefault = tipoMovimiento === 'ENTRADA' ? precioCompra : precioVenta;
+            document.getElementById('inputPrecio').value = precioDefault.toFixed(2);
+
+            // Mostrar stock disponible para salidas
+            if (tipoMovimiento === 'SALIDA') {
+                document.getElementById('stockInfo').style.display = 'block';
+                document.getElementById('stockDisponible').textContent = stock;
+                document.getElementById('inputCantidad').max = stock;
             }
+
+            calcularSubtotal();
         });
+
+        // Calcular subtotal automáticamente
+        document.getElementById('inputCantidad').addEventListener('input', calcularSubtotal);
+        document.getElementById('inputPrecio').addEventListener('input', calcularSubtotal);
+
+        function calcularSubtotal() {
+            const cantidad = parseFloat(document.getElementById('inputCantidad').value) || 0;
+            const precio = parseFloat(document.getElementById('inputPrecio').value) || 0;
+            const subtotal = cantidad * precio;
+            document.getElementById('inputSubtotal').value = subtotal.toFixed(2);
+        }
 
         function agregarDetalle() {
             const selectProducto = document.getElementById('selectProducto');
@@ -449,17 +506,26 @@
                 return;
             }
 
+            const option = selectProducto.options[selectProducto.selectedIndex];
             const productoId = selectProducto.value;
-            const productoNombre = selectProducto.options[selectProducto.selectedIndex].text;
+            const productoNombre = option.getAttribute('data-nombre');
             const cantidad = parseInt(inputCantidad.value);
             const precio = parseFloat(inputPrecio.value);
-            const subtotal = cantidad * precio;
+            const stock = parseInt(option.getAttribute('data-stock')) || 0;
+
+            // Validar stock para salidas
+            if (tipoMovimiento === 'SALIDA' && cantidad > stock) {
+                alert(`Stock insuficiente. Disponible: ${stock} unidades`);
+                return;
+            }
 
             // Verificar si ya existe el producto
             if (detalles.some(d => d.productoId === productoId)) {
                 alert('Este producto ya fue agregado');
                 return;
             }
+
+            const subtotal = cantidad * precio;
 
             const detalle = {
                 id: contadorDetalle++,
@@ -486,29 +552,24 @@
             if (detalles.length === 0) {
                 tbody.innerHTML = '<tr><td colspan="5" style="text-align: center; color: var(--gray);">No hay productos agregados</td></tr>';
                 document.getElementById('totalGeneral').textContent = '0.00';
+                document.getElementById('totalItems').textContent = '0';
+                document.getElementById('totalUnidades').textContent = '0';
                 return;
             }
 
             let html = '';
             let total = 0;
+            let totalUnidades = 0;
 
             detalles.forEach(detalle => {
                 total += detalle.subtotal;
+                totalUnidades += detalle.cantidad;
                 html += `
                     <tr>
-                        <td>
-                            ${detalle.productoNombre}
-                            <input type="hidden" name="detalles[${detalle.id}].producto.id" value="${detalle.productoId}">
-                        </td>
-                        <td>
-                            ${detalle.cantidad}
-                            <input type="hidden" name="detalles[${detalle.id}].cantidad" value="${detalle.cantidad}">
-                        </td>
-                        <td>
-                            $${detalle.precio.toFixed(2)}
-                            <input type="hidden" name="detalles[${detalle.id}].precioUnitario" value="${detalle.precio}">
-                        </td>
-                        <td>$${detalle.subtotal.toFixed(2)}</td>
+                        <td><strong>${detalle.productoNombre}</strong></td>
+                        <td>${detalle.cantidad}</td>
+                        <td>$${detalle.precio.toFixed(2)}</td>
+                        <td><strong>$${detalle.subtotal.toFixed(2)}</strong></td>
                         <td>
                             <button type="button" class="btn-modern btn-danger" style="padding: 6px 12px;" 
                                     onclick="eliminarDetalle(${detalle.id})">
@@ -521,21 +582,49 @@
 
             tbody.innerHTML = html;
             document.getElementById('totalGeneral').textContent = total.toLocaleString('es-CO', {minimumFractionDigits: 2, maximumFractionDigits: 2});
+            document.getElementById('totalItems').textContent = detalles.length;
+            document.getElementById('totalUnidades').textContent = totalUnidades;
         }
 
         function limpiarFormulario() {
             document.getElementById('selectProducto').value = '';
             document.getElementById('inputCantidad').value = '1';
             document.getElementById('inputPrecio').value = '';
+            document.getElementById('inputSubtotal').value = '0.00';
+            document.getElementById('stockInfo').style.display = 'none';
         }
 
-        // Validar antes de enviar
+        // Validar y preparar datos antes de enviar
         document.getElementById('movimientoForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+
             if (detalles.length === 0) {
-                e.preventDefault();
                 alert('Debe agregar al menos un producto');
+                return;
             }
+
+            const almacen = document.getElementById('almacenSelect').value;
+            if (!almacen) {
+                alert('Debe seleccionar un almacén');
+                return;
+            }
+
+            // Preparar datos para envío
+            const formData = new FormData(this);
+            
+            // Agregar detalles al formulario
+            detalles.forEach((detalle, index) => {
+                formData.append(`detalles[${index}].producto.id`, detalle.productoId);
+                formData.append(`detalles[${index}].cantidad`, detalle.cantidad);
+                formData.append(`detalles[${index}].precioUnitario`, detalle.precio);
+            });
+
+            // Enviar el formulario
+            this.submit();
         });
+
+        console.log('Sistema de movimientos cargado - Tipo:', tipoMovimiento);
+        /*]]>*/
     </script>
 </body>
 </html>

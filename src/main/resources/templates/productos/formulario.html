@@ -288,12 +288,11 @@
             </div>
 
             <div class="form-body">
+                <!-- CORRECCIÓN CRÍTICA: Usar th:object y th:field correctamente -->
                 <form th:action="@{${producto.id != null ? '/productos/' + producto.id : '/productos'}}" 
-                      th:object="${producto}" method="post" id="productoForm">
+                      th:object="${producto}" 
+                      method="post">
                     
-                    <!-- ID oculto para edición -->
-                    <input type="hidden" th:field="*{id}">
-
                     <!-- Información Básica -->
                     <div class="section-title">
                         <i class="bi bi-info-circle"></i> Información Básica
@@ -305,8 +304,7 @@
                                 Código <span class="required">*</span>
                             </label>
                             <input type="text" class="form-control" id="codigo" 
-                                   name="codigo"
-                                   th:value="${producto.codigo}"
+                                   th:field="*{codigo}"
                                    placeholder="Ej: PROD001" 
                                    required
                                    maxlength="50">
@@ -318,8 +316,7 @@
                                 Nombre <span class="required">*</span>
                             </label>
                             <input type="text" class="form-control" id="nombre" 
-                                   name="nombre"
-                                   th:value="${producto.nombre}"
+                                   th:field="*{nombre}"
                                    placeholder="Nombre del producto" 
                                    required
                                    maxlength="200">
@@ -329,8 +326,7 @@
                     <div class="mb-3">
                         <label for="descripcion" class="form-label">Descripción</label>
                         <textarea class="form-control" id="descripcion" 
-                                  name="descripcion"
-                                  th:text="${producto.descripcion}"
+                                  th:field="*{descripcion}"
                                   rows="3" 
                                   placeholder="Descripción detallada del producto"
                                   maxlength="500"></textarea>
@@ -363,12 +359,12 @@
 
                         <div class="col-md-4 mb-3">
                             <label for="unidadMedida" class="form-label">Unidad de Medida</label>
-                            <select class="form-select" id="unidadMedida" name="unidadMedida">
-                                <option value="UND" th:selected="${producto.unidadMedida == 'UND'}">Unidad</option>
-                                <option value="KG" th:selected="${producto.unidadMedida == 'KG'}">Kilogramo</option>
-                                <option value="LT" th:selected="${producto.unidadMedida == 'LT'}">Litro</option>
-                                <option value="MT" th:selected="${producto.unidadMedida == 'MT'}">Metro</option>
-                                <option value="CAJA" th:selected="${producto.unidadMedida == 'CAJA'}">Caja</option>
+                            <select class="form-select" id="unidadMedida" th:field="*{unidadMedida}">
+                                <option value="UND">Unidad</option>
+                                <option value="KG">Kilogramo</option>
+                                <option value="LT">Litro</option>
+                                <option value="MT">Metro</option>
+                                <option value="CAJA">Caja</option>
                             </select>
                         </div>
                     </div>
@@ -386,8 +382,7 @@
                             <div class="input-group">
                                 <span class="input-group-text">$</span>
                                 <input type="number" class="form-control" id="precioVenta" 
-                                       name="precioVenta"
-                                       th:value="${producto.precioVenta}"
+                                       th:field="*{precioVenta}"
                                        step="0.01" min="0" required>
                             </div>
                         </div>
@@ -397,8 +392,7 @@
                             <div class="input-group">
                                 <span class="input-group-text">$</span>
                                 <input type="number" class="form-control" id="precioCompra" 
-                                       name="precioCompra"
-                                       th:value="${producto.precioCompra}"
+                                       th:field="*{precioCompra}"
                                        step="0.01" min="0">
                             </div>
                         </div>
@@ -408,8 +402,7 @@
                             <div class="input-group">
                                 <span class="input-group-text">$</span>
                                 <input type="number" class="form-control" id="precioMayoreo" 
-                                       name="precioMayoreo"
-                                       th:value="${producto.precioMayoreo}"
+                                       th:field="*{precioMayoreo}"
                                        step="0.01" min="0">
                             </div>
                         </div>
@@ -426,16 +419,14 @@
                                 Stock Actual <span class="required">*</span>
                             </label>
                             <input type="number" class="form-control" id="stockActual" 
-                                   name="stockActual"
-                                   th:value="${producto.stockActual != null ? producto.stockActual : 0}"
+                                   th:field="*{stockActual}"
                                    min="0" required>
                         </div>
 
                         <div class="col-md-3 mb-3">
                             <label for="stockMinimo" class="form-label">Stock Mínimo</label>
                             <input type="number" class="form-control" id="stockMinimo" 
-                                   name="stockMinimo"
-                                   th:value="${producto.stockMinimo != null ? producto.stockMinimo : 0}"
+                                   th:field="*{stockMinimo}"
                                    min="0">
                             <div class="form-hint">Alerta de stock bajo</div>
                         </div>
@@ -443,16 +434,14 @@
                         <div class="col-md-3 mb-3">
                             <label for="stockMaximo" class="form-label">Stock Máximo</label>
                             <input type="number" class="form-control" id="stockMaximo" 
-                                   name="stockMaximo"
-                                   th:value="${producto.stockMaximo}"
+                                   th:field="*{stockMaximo}"
                                    min="0">
                         </div>
 
                         <div class="col-md-3 mb-3">
                             <label for="puntoReorden" class="form-label">Punto de Reorden</label>
                             <input type="number" class="form-control" id="puntoReorden" 
-                                   name="puntoReorden"
-                                   th:value="${producto.puntoReorden}"
+                                   th:field="*{puntoReorden}"
                                    min="0">
                         </div>
                     </div>
@@ -464,17 +453,12 @@
 
                     <div class="form-check">
                         <input type="checkbox" class="form-check-input" id="activo" 
-                               name="activo"
-                               th:checked="${producto.activo == null or producto.activo == true}"
-                               value="true">
+                               th:field="*{activo}">
                         <label class="form-check-label" for="activo">
                             <strong>Producto Activo</strong>
                             <div class="form-hint">Los productos inactivos no aparecen en movimientos</div>
                         </label>
                     </div>
-
-                    <!-- Campo hidden para manejar checkbox -->
-                    <input type="hidden" name="_activo" value="on">
 
                     <!-- Acciones -->
                     <div class="form-actions">
@@ -492,7 +476,7 @@
 
     <script>
         // Validación del formulario
-        document.getElementById('productoForm').addEventListener('submit', function(e) {
+        document.querySelector('form').addEventListener('submit', function(e) {
             const precioVenta = parseFloat(document.getElementById('precioVenta').value);
             const precioCompra = parseFloat(document.getElementById('precioCompra').value);
             
@@ -502,9 +486,6 @@
                 }
             }
         });
-
-        // Log para debug
-        console.log('Formulario de producto cargado');
     </script>
 </body>
 </html>

@@ -1,62 +1,287 @@
-<!-- src/main/resources/templates/proveedores/formulario.html -->
+<!-- FORMULARIO PROVEEDOR CORREGIDO -->
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org">
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
-    <title>Formulario Proveedor</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Formulario Proveedor - Sistema de Inventario</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #4f46e5;
+            --success: #10b981;
+            --danger: #ef4444;
+            --dark: #0f172a;
+            --gray: #64748b;
+            --gray-light: #f1f5f9;
+            --white: #ffffff;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 30px;
+        }
+
+        .form-card {
+            background: var(--white);
+            border-radius: 16px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            max-width: 900px;
+            margin: 0 auto;
+            overflow: hidden;
+        }
+
+        .form-header {
+            background: linear-gradient(135deg, var(--primary), #4338ca);
+            color: white;
+            padding: 30px;
+        }
+
+        .form-body { padding: 40px; }
+
+        .section-title {
+            font-size: 18px;
+            font-weight: 600;
+            color: var(--primary);
+            margin: 30px 0 20px 0;
+            padding-bottom: 10px;
+            border-bottom: 2px solid var(--gray-light);
+        }
+
+        .section-title:first-child { margin-top: 0; }
+
+        .form-label {
+            font-size: 14px;
+            font-weight: 600;
+            color: var(--dark);
+            margin-bottom: 8px;
+        }
+
+        .required { color: var(--danger); }
+
+        .form-control, .form-select {
+            padding: 12px 16px;
+            border: 2px solid #e2e8f0;
+            border-radius: 10px;
+            font-size: 15px;
+            transition: all 0.3s;
+        }
+
+        .form-control:focus, .form-select:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 4px rgba(79, 70, 229, 0.1);
+        }
+
+        .btn-modern {
+            padding: 14px 28px;
+            border-radius: 10px;
+            font-weight: 600;
+            border: none;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            text-decoration: none;
+        }
+
+        .btn-primary { background: var(--primary); color: white; }
+        .btn-secondary { background: var(--gray); color: white; }
+
+        .btn-modern:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
+        }
+
+        .form-actions {
+            display: flex;
+            gap: 15px;
+            justify-content: flex-end;
+            padding-top: 30px;
+            border-top: 2px solid var(--gray-light);
+            margin-top: 30px;
+        }
+    </style>
 </head>
 <body>
-    <div class="container mt-4">
-        <h2>Formulario Proveedor</h2>
-        
-        <form th:action="@{/proveedores}" th:method="post" th:object="${proveedor}">
-            <input type="hidden" th:field="*{id}">
-            
-            <div class="row">
-                <div class="col-md-6 mb-3">
-                    <label>Código:</label>
-                    <input type="text" class="form-control" th:field="*{codigo}" required>
+    <div class="form-card">
+        <div class="form-header">
+            <h2>
+                <i class="bi bi-truck"></i>
+                <span th:if="${proveedor.id == null}">Nuevo Proveedor</span>
+                <span th:if="${proveedor.id != null}">Editar Proveedor</span>
+            </h2>
+        </div>
+
+        <div class="form-body">
+            <!-- CORRECCIÓN: Usar th:object correctamente -->
+            <form th:action="@{${proveedor.id != null ? '/proveedores/' + proveedor.id : '/proveedores'}}" 
+                  th:object="${proveedor}" 
+                  method="post">
+
+                <!-- Información Básica -->
+                <div class="section-title">
+                    <i class="bi bi-info-circle"></i> Información Básica
                 </div>
                 
-                <div class="col-md-6 mb-3">
-                    <label>Nombre:</label>
-                    <input type="text" class="form-control" th:field="*{nombre}" required>
+                <div class="row">
+                    <div class="col-md-6 mb-3">
+                        <label for="codigo" class="form-label">
+                            Código <span class="required">*</span>
+                        </label>
+                        <input type="text" class="form-control" id="codigo" 
+                               th:field="*{codigo}" 
+                               placeholder="Ej: PROV001" required>
+                    </div>
+
+                    <div class="col-md-6 mb-3">
+                        <label for="razonSocial" class="form-label">
+                            Razón Social <span class="required">*</span>
+                        </label>
+                        <input type="text" class="form-control" id="razonSocial" 
+                               th:field="*{razonSocial}" 
+                               placeholder="Razón social del proveedor" required>
+                    </div>
                 </div>
-            </div>
-            
-            <div class="row">
-                <div class="col-md-6 mb-3">
-                    <label>Razón Social:</label>
-                    <input type="text" class="form-control" th:field="*{razonSocial}">
+
+                <div class="row">
+                    <div class="col-md-6 mb-3">
+                        <label for="nombreComercial" class="form-label">Nombre Comercial</label>
+                        <input type="text" class="form-control" id="nombreComercial" 
+                               th:field="*{nombreComercial}" 
+                               placeholder="Nombre comercial">
+                    </div>
+
+                    <div class="col-md-6 mb-3">
+                        <label for="rfc" class="form-label">RFC</label>
+                        <input type="text" class="form-control" id="rfc" 
+                               th:field="*{rfc}" 
+                               placeholder="RFC del proveedor">
+                    </div>
                 </div>
-                
-                <div class="col-md-6 mb-3">
-                    <label>RUC:</label>
-                    <input type="text" class="form-control" th:field="*{ruc}">
+
+                <!-- Contacto -->
+                <div class="section-title">
+                    <i class="bi bi-telephone"></i> Información de Contacto
                 </div>
-            </div>
-            
-            <div class="row">
-                <div class="col-md-6 mb-3">
-                    <label>Teléfono:</label>
-                    <input type="text" class="form-control" th:field="*{telefono}">
+
+                <div class="row">
+                    <div class="col-md-4 mb-3">
+                        <label for="telefono" class="form-label">Teléfono</label>
+                        <input type="text" class="form-control" id="telefono" 
+                               th:field="*{telefono}" 
+                               placeholder="Teléfono fijo">
+                    </div>
+
+                    <div class="col-md-4 mb-3">
+                        <label for="celular" class="form-label">Celular</label>
+                        <input type="text" class="form-control" id="celular" 
+                               th:field="*{celular}" 
+                               placeholder="Celular">
+                    </div>
+
+                    <div class="col-md-4 mb-3">
+                        <label for="email" class="form-label">Email</label>
+                        <input type="email" class="form-control" id="email" 
+                               th:field="*{email}" 
+                               placeholder="correo@ejemplo.com">
+                    </div>
                 </div>
-                
-                <div class="col-md-6 mb-3">
-                    <label>Email:</label>
-                    <input type="email" class="form-control" th:field="*{email}">
+
+                <!-- Dirección -->
+                <div class="section-title">
+                    <i class="bi bi-geo-alt"></i> Dirección
                 </div>
-            </div>
-            
-            <div class="mb-3">
-                <label>Dirección:</label>
-                <input type="text" class="form-control" th:field="*{direccion}">
-            </div>
-            
-            <button type="submit" class="btn btn-primary">Guardar</button>
-            <a href="/proveedores" class="btn btn-secondary">Cancelar</a>
-        </form>
+
+                <div class="mb-3">
+                    <label for="direccion" class="form-label">Dirección Completa</label>
+                    <textarea class="form-control" id="direccion" 
+                              th:field="*{direccion}" 
+                              rows="2" 
+                              placeholder="Calle, número, colonia"></textarea>
+                </div>
+
+                <div class="row">
+                    <div class="col-md-4 mb-3">
+                        <label for="ciudad" class="form-label">Ciudad</label>
+                        <input type="text" class="form-control" id="ciudad" 
+                               th:field="*{ciudad}" 
+                               placeholder="Ciudad">
+                    </div>
+
+                    <div class="col-md-4 mb-3">
+                        <label for="estado" class="form-label">Estado</label>
+                        <input type="text" class="form-control" id="estado" 
+                               th:field="*{estado}" 
+                               placeholder="Estado">
+                    </div>
+
+                    <div class="col-md-4 mb-3">
+                        <label for="codigoPostal" class="form-label">Código Postal</label>
+                        <input type="text" class="form-control" id="codigoPostal" 
+                               th:field="*{codigoPostal}" 
+                               placeholder="CP">
+                    </div>
+                </div>
+
+                <!-- Crédito -->
+                <div class="section-title">
+                    <i class="bi bi-credit-card"></i> Información de Crédito
+                </div>
+
+                <div class="row">
+                    <div class="col-md-4 mb-3">
+                        <label for="diasCredito" class="form-label">Días de Crédito</label>
+                        <input type="number" class="form-control" id="diasCredito" 
+                               th:field="*{diasCredito}" 
+                               min="0">
+                    </div>
+
+                    <div class="col-md-4 mb-3">
+                        <label for="limiteCredito" class="form-label">Límite de Crédito</label>
+                        <div class="input-group">
+                            <span class="input-group-text">$</span>
+                            <input type="number" class="form-control" id="limiteCredito" 
+                                   th:field="*{limiteCredito}" 
+                                   step="0.01" min="0">
+                        </div>
+                    </div>
+
+                    <div class="col-md-4 mb-3">
+                        <label for="calificacion" class="form-label">Calificación (1-5)</label>
+                        <input type="number" class="form-control" id="calificacion" 
+                               th:field="*{calificacion}" 
+                               min="1" max="5">
+                    </div>
+                </div>
+
+                <!-- Observaciones -->
+                <div class="mb-3">
+                    <label for="notas" class="form-label">Observaciones</label>
+                    <textarea class="form-control" id="notas" 
+                              th:field="*{notas}" 
+                              rows="3" 
+                              placeholder="Notas adicionales sobre el proveedor"></textarea>
+                </div>
+
+                <!-- Acciones -->
+                <div class="form-actions">
+                    <a href="/proveedores" class="btn-modern btn-secondary">
+                        <i class="bi bi-x-circle"></i> Cancelar
+                    </a>
+                    <button type="submit" class="btn-modern btn-primary">
+                        <i class="bi bi-save"></i> Guardar Proveedor
+                    </button>
+                </div>
+            </form>
+        </div>
     </div>
 </body>
 </html>
