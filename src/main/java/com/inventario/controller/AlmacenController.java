@@ -37,7 +37,9 @@ public class AlmacenController {
 
     @GetMapping("/nuevo")
     public String nuevoForm(Model model) {
-        model.addAttribute("almacen", new Almacen());
+        Almacen almacen = new Almacen();
+        almacen.setActivo(true); // Por defecto activo
+        model.addAttribute("almacen", almacen);
         model.addAttribute("usuarios", usuarioService.listarActivos());
         return "almacenes/formulario";
     }
@@ -45,18 +47,38 @@ public class AlmacenController {
     @PostMapping
     public String crear(@Valid @ModelAttribute Almacen almacen,
                        BindingResult result,
+                       @RequestParam(value = "usuarioResponsableId", required = false) Integer usuarioResponsableId,
                        RedirectAttributes redirect,
                        Model model) {
+        
+        System.out.println("=== CREAR ALMACÉN ===");
+        System.out.println("Código: " + almacen.getCodigo());
+        System.out.println("Nombre: " + almacen.getNombre());
+        System.out.println("Activo: " + almacen.getActivo());
+        System.out.println("Usuario Responsable ID: " + usuarioResponsableId);
+        
         if (result.hasErrors()) {
             model.addAttribute("usuarios", usuarioService.listarActivos());
             return "almacenes/formulario";
         }
         
         try {
+            // Asignar usuario responsable si existe
+            if (usuarioResponsableId != null && usuarioResponsableId > 0) {
+                usuarioService.obtenerPorId(usuarioResponsableId)
+                    .ifPresent(almacen::setUsuarioResponsable);
+            }
+            
+            // Asegurar que activo tenga un valor
+            if (almacen.getActivo() == null) {
+                almacen.setActivo(true);
+            }
+            
             service.crear(almacen);
             redirect.addFlashAttribute("mensaje", "Almacén creado exitosamente");
             redirect.addFlashAttribute("tipo", "success");
         } catch (Exception e) {
+            e.printStackTrace();
             redirect.addFlashAttribute("mensaje", "Error: " + e.getMessage());
             redirect.addFlashAttribute("tipo", "error");
         }
@@ -82,18 +104,32 @@ public class AlmacenController {
     public String actualizar(@PathVariable Integer id,
                             @Valid @ModelAttribute Almacen almacen,
                             BindingResult result,
+                            @RequestParam(value = "usuarioResponsableId", required = false) Integer usuarioResponsableId,
                             RedirectAttributes redirect,
                             Model model) {
+        
+        System.out.println("=== ACTUALIZAR ALMACÉN ===");
+        System.out.println("ID: " + id);
+        System.out.println("Nombre: " + almacen.getNombre());
+        System.out.println("Activo: " + almacen.getActivo());
+        
         if (result.hasErrors()) {
             model.addAttribute("usuarios", usuarioService.listarActivos());
             return "almacenes/formulario";
         }
         
         try {
+            // Asignar usuario responsable si existe
+            if (usuarioResponsableId != null && usuarioResponsableId > 0) {
+                usuarioService.obtenerPorId(usuarioResponsableId)
+                    .ifPresent(almacen::setUsuarioResponsable);
+            }
+            
             service.actualizar(id, almacen);
             redirect.addFlashAttribute("mensaje", "Almacén actualizado exitosamente");
             redirect.addFlashAttribute("tipo", "success");
         } catch (Exception e) {
+            e.printStackTrace();
             redirect.addFlashAttribute("mensaje", "Error: " + e.getMessage());
             redirect.addFlashAttribute("tipo", "error");
         }
@@ -103,7 +139,7 @@ public class AlmacenController {
     @GetMapping("/{id}/eliminar")
     public String eliminar(@PathVariable Integer id, RedirectAttributes redirect) {
         try {
-            System.out.println("=== ELIMINAR ALMACÉN ===");
+            System.out.println("=== DESACTIVAR ALMACÉN ===");
             System.out.println("ID: " + id);
             
             service.eliminar(id);
@@ -112,8 +148,6 @@ public class AlmacenController {
             redirect.addFlashAttribute("tipo", "success");
         } catch (Exception e) {
             e.printStackTrace();
-            System.err.println("Error al desactivar almacén: " + e.getMessage());
-            
             redirect.addFlashAttribute("mensaje", "Error: " + e.getMessage());
             redirect.addFlashAttribute("tipo", "error");
         }

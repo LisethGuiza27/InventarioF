@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="es">
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -10,7 +10,6 @@
     <style>
         :root {
             --primary: #4f46e5;
-            --primary-dark: #4338ca;
             --success: #10b981;
             --danger: #ef4444;
             --dark: #0f172a;
@@ -19,11 +18,7 @@
             --white: #ffffff;
         }
 
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
 
         body {
             font-family: 'Inter', sans-serif;
@@ -59,9 +54,7 @@
             gap: 10px;
         }
 
-        .sidebar-menu {
-            padding: 0 15px;
-        }
+        .sidebar-menu { padding: 0 15px; }
 
         .menu-item {
             display: block;
@@ -101,18 +94,12 @@
         }
 
         @keyframes slideIn {
-            from {
-                opacity: 0;
-                transform: translateY(20px);
-            }
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
         }
 
         .form-header {
-            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+            background: linear-gradient(135deg, var(--primary), #4338ca);
             color: white;
             padding: 30px;
         }
@@ -126,9 +113,7 @@
             gap: 12px;
         }
 
-        .form-body {
-            padding: 40px;
-        }
+        .form-body { padding: 40px; }
 
         .section-title {
             font-size: 18px;
@@ -142,9 +127,7 @@
             gap: 10px;
         }
 
-        .section-title:first-child {
-            margin-top: 0;
-        }
+        .section-title:first-child { margin-top: 0; }
 
         .form-label {
             font-size: 14px;
@@ -156,9 +139,7 @@
             gap: 5px;
         }
 
-        .required {
-            color: var(--danger);
-        }
+        .required { color: var(--danger); }
 
         .form-control, .form-select {
             padding: 12px 16px;
@@ -227,7 +208,7 @@
         }
 
         .btn-primary:hover {
-            background: var(--primary-dark);
+            background: #4338ca;
             transform: translateY(-2px);
             box-shadow: 0 10px 20px rgba(79, 70, 229, 0.3);
         }
@@ -309,6 +290,8 @@
             <div class="form-body">
                 <form th:action="@{${producto.id != null ? '/productos/' + producto.id : '/productos'}}" 
                       th:object="${producto}" method="post" id="productoForm">
+                    
+                    <!-- ID oculto para edición -->
                     <input type="hidden" th:field="*{id}">
 
                     <!-- Información Básica -->
@@ -322,7 +305,10 @@
                                 Código <span class="required">*</span>
                             </label>
                             <input type="text" class="form-control" id="codigo" 
-                                   th:field="*{codigo}" placeholder="Ej: PROD001" required
+                                   name="codigo"
+                                   th:value="${producto.codigo}"
+                                   placeholder="Ej: PROD001" 
+                                   required
                                    maxlength="50">
                             <div class="form-hint">Código único del producto</div>
                         </div>
@@ -332,50 +318,57 @@
                                 Nombre <span class="required">*</span>
                             </label>
                             <input type="text" class="form-control" id="nombre" 
-                                   th:field="*{nombre}" placeholder="Nombre del producto" required
+                                   name="nombre"
+                                   th:value="${producto.nombre}"
+                                   placeholder="Nombre del producto" 
+                                   required
                                    maxlength="200">
                         </div>
                     </div>
 
                     <div class="mb-3">
                         <label for="descripcion" class="form-label">Descripción</label>
-                        <textarea class="form-control" id="descripcion" th:field="*{descripcion}" 
-                                  rows="3" placeholder="Descripción detallada del producto"
+                        <textarea class="form-control" id="descripcion" 
+                                  name="descripcion"
+                                  th:text="${producto.descripcion}"
+                                  rows="3" 
+                                  placeholder="Descripción detallada del producto"
                                   maxlength="500"></textarea>
                     </div>
 
-                    <div class="col-md-4 mb-3">
-                        <label for="categoriaId" class="form-label">Categoría</label>
-                        <select class="form-select" id="categoriaId" name="categoriaId">
-                            <option value="">-- Seleccione --</option>
-                            <option th:each="cat : ${categorias}" 
-                                    th:value="${cat.id}" 
-                                    th:text="${cat.nombre}"
-                                    th:selected="${producto.categoria != null and producto.categoria.id == cat.id}">
-                            </option>
-                        </select>
-                    </div>
+                    <div class="row">
+                        <div class="col-md-4 mb-3">
+                            <label for="categoriaId" class="form-label">Categoría</label>
+                            <select class="form-select" id="categoriaId" name="categoriaId">
+                                <option value="">-- Seleccione --</option>
+                                <option th:each="cat : ${categorias}" 
+                                        th:value="${cat.id}" 
+                                        th:text="${cat.nombre}"
+                                        th:selected="${producto.categoria != null and producto.categoria.id == cat.id}">
+                                </option>
+                            </select>
+                        </div>
 
-                    <div class="col-md-4 mb-3">
-                        <label for="proveedorId" class="form-label">Proveedor</label>
-                        <select class="form-select" id="proveedorId" name="proveedorId">
-                            <option value="">-- Seleccione --</option>
-                            <option th:each="prov : ${proveedores}" 
-                                    th:value="${prov.id}" 
-                                    th:text="${prov.nombre}"
-                                    th:selected="${producto.proveedor != null and producto.proveedor.id == prov.id}">
-                            </option>
-                        </select>
-                    </div>
+                        <div class="col-md-4 mb-3">
+                            <label for="proveedorId" class="form-label">Proveedor</label>
+                            <select class="form-select" id="proveedorId" name="proveedorId">
+                                <option value="">-- Seleccione --</option>
+                                <option th:each="prov : ${proveedores}" 
+                                        th:value="${prov.id}" 
+                                        th:text="${prov.razonSocial}"
+                                        th:selected="${producto.proveedor != null and producto.proveedor.id == prov.id}">
+                                </option>
+                            </select>
+                        </div>
 
                         <div class="col-md-4 mb-3">
                             <label for="unidadMedida" class="form-label">Unidad de Medida</label>
-                            <select class="form-select" id="unidadMedida" th:field="*{unidadMedida}">
-                                <option value="UND">Unidad</option>
-                                <option value="KG">Kilogramo</option>
-                                <option value="LT">Litro</option>
-                                <option value="MT">Metro</option>
-                                <option value="CAJA">Caja</option>
+                            <select class="form-select" id="unidadMedida" name="unidadMedida">
+                                <option value="UND" th:selected="${producto.unidadMedida == 'UND'}">Unidad</option>
+                                <option value="KG" th:selected="${producto.unidadMedida == 'KG'}">Kilogramo</option>
+                                <option value="LT" th:selected="${producto.unidadMedida == 'LT'}">Litro</option>
+                                <option value="MT" th:selected="${producto.unidadMedida == 'MT'}">Metro</option>
+                                <option value="CAJA" th:selected="${producto.unidadMedida == 'CAJA'}">Caja</option>
                             </select>
                         </div>
                     </div>
@@ -393,7 +386,9 @@
                             <div class="input-group">
                                 <span class="input-group-text">$</span>
                                 <input type="number" class="form-control" id="precioVenta" 
-                                       th:field="*{precioVenta}" step="0.01" min="0" required>
+                                       name="precioVenta"
+                                       th:value="${producto.precioVenta}"
+                                       step="0.01" min="0" required>
                             </div>
                         </div>
 
@@ -402,7 +397,9 @@
                             <div class="input-group">
                                 <span class="input-group-text">$</span>
                                 <input type="number" class="form-control" id="precioCompra" 
-                                       th:field="*{precioCompra}" step="0.01" min="0">
+                                       name="precioCompra"
+                                       th:value="${producto.precioCompra}"
+                                       step="0.01" min="0">
                             </div>
                         </div>
 
@@ -411,7 +408,9 @@
                             <div class="input-group">
                                 <span class="input-group-text">$</span>
                                 <input type="number" class="form-control" id="precioMayoreo" 
-                                       th:field="*{precioMayoreo}" step="0.01" min="0">
+                                       name="precioMayoreo"
+                                       th:value="${producto.precioMayoreo}"
+                                       step="0.01" min="0">
                             </div>
                         </div>
                     </div>
@@ -427,26 +426,34 @@
                                 Stock Actual <span class="required">*</span>
                             </label>
                             <input type="number" class="form-control" id="stockActual" 
-                                   th:field="*{stockActual}" min="0" required>
+                                   name="stockActual"
+                                   th:value="${producto.stockActual != null ? producto.stockActual : 0}"
+                                   min="0" required>
                         </div>
 
                         <div class="col-md-3 mb-3">
                             <label for="stockMinimo" class="form-label">Stock Mínimo</label>
                             <input type="number" class="form-control" id="stockMinimo" 
-                                   th:field="*{stockMinimo}" min="0">
+                                   name="stockMinimo"
+                                   th:value="${producto.stockMinimo != null ? producto.stockMinimo : 0}"
+                                   min="0">
                             <div class="form-hint">Alerta de stock bajo</div>
                         </div>
 
                         <div class="col-md-3 mb-3">
                             <label for="stockMaximo" class="form-label">Stock Máximo</label>
                             <input type="number" class="form-control" id="stockMaximo" 
-                                   th:field="*{stockMaximo}" min="0">
+                                   name="stockMaximo"
+                                   th:value="${producto.stockMaximo}"
+                                   min="0">
                         </div>
 
                         <div class="col-md-3 mb-3">
                             <label for="puntoReorden" class="form-label">Punto de Reorden</label>
                             <input type="number" class="form-control" id="puntoReorden" 
-                                   th:field="*{puntoReorden}" min="0">
+                                   name="puntoReorden"
+                                   th:value="${producto.puntoReorden}"
+                                   min="0">
                         </div>
                     </div>
 
@@ -457,12 +464,17 @@
 
                     <div class="form-check">
                         <input type="checkbox" class="form-check-input" id="activo" 
-                               th:field="*{activo}">
+                               name="activo"
+                               th:checked="${producto.activo == null or producto.activo == true}"
+                               value="true">
                         <label class="form-check-label" for="activo">
                             <strong>Producto Activo</strong>
                             <div class="form-hint">Los productos inactivos no aparecen en movimientos</div>
                         </label>
                     </div>
+
+                    <!-- Campo hidden para manejar checkbox -->
+                    <input type="hidden" name="_activo" value="on">
 
                     <!-- Acciones -->
                     <div class="form-actions">
@@ -490,6 +502,9 @@
                 }
             }
         });
+
+        // Log para debug
+        console.log('Formulario de producto cargado');
     </script>
 </body>
 </html>

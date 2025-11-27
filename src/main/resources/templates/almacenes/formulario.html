@@ -37,6 +37,28 @@
                 <input type="text" class="form-control" th:field="*{ciudad}">
             </div>
             
+            <!-- Agregar en almacenes/formulario.html antes del botón guardar -->
+            <div class="form-check mb-3">
+                <input type="checkbox" class="form-check-input" id="activo" 
+                       th:field="*{activo}" checked>
+                <label class="form-check-label" for="activo">
+                    Almacén Activo
+                </label>
+            </div>
+
+            <!-- Para usuario responsable -->
+            <div class="mb-3">
+                <label>Usuario Responsable:</label>
+                <select class="form-control" name="usuarioResponsableId">
+                    <option value="">-- Seleccione --</option>
+                    <option th:each="u : ${usuarios}" 
+                            th:value="${u.id}" 
+                            th:text="${u.nombreCompleto}"
+                            th:selected="${almacen.usuarioResponsable != null and almacen.usuarioResponsable.id == u.id}">
+                    </option>
+                </select>
+            </div>
+            
             <button type="submit" class="btn btn-primary">Guardar</button>
             <a href="/almacenes" class="btn btn-secondary">Cancelar</a>
         </form>

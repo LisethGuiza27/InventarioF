@@ -32,34 +32,58 @@ public class ProveedorController {
             model.addAttribute("proveedores", proveedores);
             return "proveedores/listado";
         } catch (Exception e) {
+            e.printStackTrace();
             model.addAttribute("error", "Error al cargar proveedores: " + e.getMessage());
+            model.addAttribute("proveedores", List.of());
             return "proveedores/listado";
         }
     }
 
     @GetMapping("/nuevo")
     public String nuevoForm(Model model) {
-        model.addAttribute("proveedor", new Proveedor());
+        Proveedor proveedor = new Proveedor();
+        proveedor.setActivo(true);
+        model.addAttribute("proveedor", proveedor);
         return "proveedores/formulario";
     }
 
     @PostMapping
     public String crear(@Valid @ModelAttribute Proveedor proveedor,
                        BindingResult result,
-                       RedirectAttributes redirect) {
+                       RedirectAttributes redirect,
+                       Model model) {
+        
+        System.out.println("=== CREAR PROVEEDOR ===");
+        System.out.println("Código: " + proveedor.getCodigo());
+        System.out.println("Razón Social: " + proveedor.getRazonSocial());
+        
         if (result.hasErrors()) {
+            System.out.println("Errores de validación:");
+            result.getAllErrors().forEach(error -> 
+                System.out.println("- " + error.getDefaultMessage())
+            );
             return "proveedores/formulario";
         }
         
         try {
+            // Inicializar valores por defecto
+            if (proveedor.getDiasCredito() == null) proveedor.setDiasCredito(0);
+            if (proveedor.getLimiteCredito() == null) proveedor.setLimiteCredito(0.0);
+            if (proveedor.getSaldoPendiente() == null) proveedor.setSaldoPendiente(0.0);
+            if (proveedor.getCalificacion() == null) proveedor.setCalificacion(5);
+            if (proveedor.getPais() == null || proveedor.getPais().isEmpty()) proveedor.setPais("Colombia");
+            if (proveedor.getActivo() == null) proveedor.setActivo(true);
+            
             service.crear(proveedor);
             redirect.addFlashAttribute("mensaje", "Proveedor creado exitosamente");
             redirect.addFlashAttribute("tipo", "success");
+            return "redirect:/proveedores";
         } catch (Exception e) {
+            e.printStackTrace();
             redirect.addFlashAttribute("mensaje", "Error: " + e.getMessage());
             redirect.addFlashAttribute("tipo", "error");
+            return "redirect:/proveedores/nuevo";
         }
-        return "redirect:/proveedores";
     }
 
     @GetMapping("/{id}/editar")
@@ -90,6 +114,7 @@ public class ProveedorController {
             redirect.addFlashAttribute("mensaje", "Proveedor actualizado exitosamente");
             redirect.addFlashAttribute("tipo", "success");
         } catch (Exception e) {
+            e.printStackTrace();
             redirect.addFlashAttribute("mensaje", "Error: " + e.getMessage());
             redirect.addFlashAttribute("tipo", "error");
         }
@@ -103,6 +128,7 @@ public class ProveedorController {
             redirect.addFlashAttribute("mensaje", "Proveedor eliminado exitosamente");
             redirect.addFlashAttribute("tipo", "success");
         } catch (Exception e) {
+            e.printStackTrace();
             redirect.addFlashAttribute("mensaje", "Error: " + e.getMessage());
             redirect.addFlashAttribute("tipo", "error");
         }
