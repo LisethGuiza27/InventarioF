@@ -346,23 +346,25 @@
 
                     <div class="row">
                         <div class="col-md-4 mb-3">
-                            <label for="categoria" class="form-label">Categoría</label>
-                            <select class="form-select" id="categoria" th:field="*{categoria.id}">
+                            <label for="categoriaId" class="form-label">Categoría</label>
+                            <select class="form-select" id="categoriaId" name="categoria.id">
                                 <option value="">-- Seleccione --</option>
                                 <option th:each="cat : ${categorias}" 
                                         th:value="${cat.id}" 
-                                        th:text="${cat.nombre}">
+                                        th:text="${cat.nombre}"
+                                        th:selected="${producto.categoria != null and producto.categoria.id == cat.id}">
                                 </option>
                             </select>
                         </div>
 
                         <div class="col-md-4 mb-3">
-                            <label for="proveedor" class="form-label">Proveedor</label>
-                            <select class="form-select" id="proveedor" th:field="*{proveedor.id}">
+                            <label for="proveedorId" class="form-label">Proveedor</label>
+                            <select class="form-select" id="proveedorId" name="proveedor.id">
                                 <option value="">-- Seleccione --</option>
                                 <option th:each="prov : ${proveedores}" 
                                         th:value="${prov.id}" 
-                                        th:text="${prov.nombre}">
+                                        th:text="${prov.nombre}"
+                                        th:selected="${producto.proveedor != null and producto.proveedor.id == prov.id}">
                                 </option>
                             </select>
                         </div>

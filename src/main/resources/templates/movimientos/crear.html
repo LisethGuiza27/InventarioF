@@ -1,1 +1,541 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Nuevo Movimiento - Sistema de Inventario</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #4f46e5;
+            --success: #10b981;
+            --danger: #ef4444;
+            --dark: #0f172a;
+            --gray: #64748b;
+            --gray-light: #f1f5f9;
+            --white: #ffffff;
+        }
 
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+        }
+
+        .sidebar {
+            position: fixed;
+            left: 0;
+            top: 0;
+            width: 260px;
+            height: 100vh;
+            background: var(--dark);
+            padding: 20px 0;
+            overflow-y: auto;
+            z-index: 1000;
+        }
+
+        .sidebar-logo {
+            padding: 0 25px 30px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            margin-bottom: 20px;
+        }
+
+        .sidebar-logo h1 {
+            color: var(--white);
+            font-size: 24px;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .sidebar-menu {
+            padding: 0 15px;
+        }
+
+        .menu-item {
+            display: block;
+            padding: 12px 20px;
+            color: rgba(255, 255, 255, 0.7);
+            text-decoration: none;
+            border-radius: 8px;
+            margin-bottom: 5px;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-weight: 500;
+        }
+
+        .menu-item:hover {
+            background: rgba(255, 255, 255, 0.1);
+            color: var(--white);
+        }
+
+        .menu-item.active {
+            background: var(--primary);
+            color: var(--white);
+        }
+
+        .main-content {
+            margin-left: 260px;
+            padding: 30px;
+        }
+
+        .form-card {
+            background: var(--white);
+            border-radius: 16px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            overflow: hidden;
+        }
+
+        .form-header {
+            background: linear-gradient(135deg, var(--primary), #4338ca);
+            color: white;
+            padding: 30px;
+        }
+
+        .form-header.entrada {
+            background: linear-gradient(135deg, var(--success), #059669);
+        }
+
+        .form-header.salida {
+            background: linear-gradient(135deg, var(--danger), #dc2626);
+        }
+
+        .form-body {
+            padding: 40px;
+        }
+
+        .section-title {
+            font-size: 18px;
+            font-weight: 600;
+            color: var(--primary);
+            margin: 30px 0 20px 0;
+            padding-bottom: 10px;
+            border-bottom: 2px solid var(--gray-light);
+        }
+
+        .form-label {
+            font-size: 14px;
+            font-weight: 600;
+            color: var(--dark);
+            margin-bottom: 8px;
+        }
+
+        .form-control, .form-select {
+            padding: 12px 16px;
+            border: 2px solid #e2e8f0;
+            border-radius: 10px;
+            font-size: 15px;
+            transition: all 0.3s;
+        }
+
+        .form-control:focus, .form-select:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 4px rgba(79, 70, 229, 0.1);
+        }
+
+        .btn-modern {
+            padding: 12px 24px;
+            border-radius: 10px;
+            font-weight: 600;
+            border: none;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            text-decoration: none;
+        }
+
+        .btn-primary {
+            background: var(--primary);
+            color: white;
+        }
+
+        .btn-success {
+            background: var(--success);
+            color: white;
+        }
+
+        .btn-danger {
+            background: var(--danger);
+            color: white;
+        }
+
+        .btn-secondary {
+            background: var(--gray);
+            color: white;
+        }
+
+        .btn-modern:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
+            color: white;
+        }
+
+        .detalle-table {
+            width: 100%;
+            margin-top: 20px;
+            border-collapse: separate;
+            border-spacing: 0 10px;
+        }
+
+        .detalle-table thead th {
+            background: var(--gray-light);
+            padding: 12px;
+            font-size: 13px;
+            font-weight: 600;
+            text-transform: uppercase;
+            color: var(--gray);
+        }
+
+        .detalle-table tbody tr {
+            background: white;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+        }
+
+        .detalle-table tbody td {
+            padding: 12px;
+            border-top: 1px solid var(--gray-light);
+            border-bottom: 1px solid var(--gray-light);
+        }
+
+        .detalle-table tbody td:first-child {
+            border-left: 1px solid var(--gray-light);
+            border-radius: 8px 0 0 8px;
+        }
+
+        .detalle-table tbody td:last-child {
+            border-right: 1px solid var(--gray-light);
+            border-radius: 0 8px 8px 0;
+        }
+
+        .total-box {
+            background: linear-gradient(135deg, var(--primary), #4338ca);
+            color: white;
+            padding: 20px;
+            border-radius: 12px;
+            margin-top: 20px;
+            text-align: right;
+        }
+
+        .total-label {
+            font-size: 16px;
+            opacity: 0.9;
+        }
+
+        .total-value {
+            font-size: 32px;
+            font-weight: 700;
+        }
+    </style>
+</head>
+<body>
+    <!-- Sidebar -->
+    <nav class="sidebar">
+        <div class="sidebar-logo">
+            <h1><i class="bi bi-boxes"></i> InventaPro</h1>
+        </div>
+        <div class="sidebar-menu">
+            <a href="/dashboard" class="menu-item">
+                <i class="bi bi-speedometer2"></i> Dashboard
+            </a>
+            <a href="/productos" class="menu-item">
+                <i class="bi bi-box-seam"></i> Productos
+            </a>
+            <a href="/movimientos" class="menu-item active">
+                <i class="bi bi-arrow-left-right"></i> Movimientos
+            </a>
+            <a href="/almacenes" class="menu-item">
+                <i class="bi bi-building"></i> Almacenes
+            </a>
+            <a href="/proveedores" class="menu-item">
+                <i class="bi bi-truck"></i> Proveedores
+            </a>
+            <a href="/clientes" class="menu-item">
+                <i class="bi bi-people"></i> Clientes
+            </a>
+            <a href="/reportes" class="menu-item">
+                <i class="bi bi-graph-up"></i> Reportes
+            </a>
+            <a href="/usuarios" class="menu-item">
+                <i class="bi bi-person-gear"></i> Usuarios
+            </a>
+            <a href="/logout" class="menu-item">
+                <i class="bi bi-box-arrow-right"></i> Cerrar Sesión
+            </a>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <div class="main-content">
+        <div class="form-card">
+            <div class="form-header" th:classappend="${tipo == 'ENTRADA'} ? 'entrada' : (${tipo == 'SALIDA'} ? 'salida' : '')">
+                <h2>
+                    <i class="bi" th:classappend="${tipo == 'ENTRADA'} ? 'bi-arrow-down-circle' : 'bi-arrow-up-circle'"></i>
+                    <span th:if="${tipo == 'ENTRADA'}">Nueva Entrada de Inventario</span>
+                    <span th:if="${tipo == 'SALIDA'}">Nueva Salida de Inventario</span>
+                    <span th:if="${tipo != 'ENTRADA' and tipo != 'SALIDA'}">Nuevo Movimiento</span>
+                </h2>
+                <p style="margin: 10px 0 0 0; opacity: 0.9;">
+                    <span th:if="${tipo == 'ENTRADA'}">Registra la entrada de productos al inventario</span>
+                    <span th:if="${tipo == 'SALIDA'}">Registra la salida de productos del inventario</span>
+                </p>
+            </div>
+
+            <div class="form-body">
+                <form th:action="${tipo == 'ENTRADA'} ? @{/movimientos/entrada} : @{/movimientos/salida}" 
+                      method="post" id="movimientoForm">
+                    
+                    <!-- Información General -->
+                    <div class="section-title">
+                        <i class="bi bi-info-circle"></i> Información General
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-4 mb-3">
+                            <label class="form-label">Almacén <span style="color: var(--danger);">*</span></label>
+                            <select class="form-select" name="almacen.id" required>
+                                <option value="">-- Seleccione --</option>
+                                <option th:each="almacen : ${almacenes}" 
+                                        th:value="${almacen.id}" 
+                                        th:text="${almacen.nombre}">
+                                </option>
+                            </select>
+                        </div>
+
+                        <div class="col-md-4 mb-3" th:if="${tipo == 'ENTRADA'}">
+                            <label class="form-label">Proveedor</label>
+                            <select class="form-select" name="proveedor.id">
+                                <option value="">-- Seleccione --</option>
+                                <option th:each="prov : ${proveedores}" 
+                                        th:value="${prov.id}" 
+                                        th:text="${prov.nombre}">
+                                </option>
+                            </select>
+                        </div>
+
+                        <div class="col-md-4 mb-3" th:if="${tipo == 'SALIDA'}">
+                            <label class="form-label">Cliente</label>
+                            <select class="form-select" name="cliente.id">
+                                <option value="">-- Seleccione --</option>
+                                <option th:each="cliente : ${clientes}" 
+                                        th:value="${cliente.id}" 
+                                        th:text="${cliente.nombre}">
+                                </option>
+                            </select>
+                        </div>
+
+                        <div class="col-md-4 mb-3">
+                            <label class="form-label">Número Documento</label>
+                            <input type="text" class="form-control" name="numeroDocumento" 
+                                   placeholder="Ej: FAC-001">
+                        </div>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label">Observaciones</label>
+                        <textarea class="form-control" name="observaciones" rows="3" 
+                                  placeholder="Observaciones adicionales sobre este movimiento"></textarea>
+                    </div>
+
+                    <!-- Detalle de Productos -->
+                    <div class="section-title">
+                        <i class="bi bi-list-check"></i> Detalle de Productos
+                    </div>
+
+                    <div class="row mb-3">
+                        <div class="col-md-5">
+                            <label class="form-label">Producto</label>
+                            <select class="form-select" id="selectProducto">
+                                <option value="">-- Seleccione un producto --</option>
+                                <option th:each="prod : ${productos}" 
+                                        th:value="${prod.id}" 
+                                        th:text="${prod.codigo + ' - ' + prod.nombre}"
+                                        th:attr="data-precio=${prod.precioVenta}, data-stock=${prod.stockActual}">
+                                </option>
+                            </select>
+                        </div>
+                        <div class="col-md-3">
+                            <label class="form-label">Cantidad</label>
+                            <input type="number" class="form-control" id="inputCantidad" 
+                                   min="1" value="1" placeholder="Cantidad">
+                        </div>
+                        <div class="col-md-3">
+                            <label class="form-label">Precio Unitario</label>
+                            <input type="number" class="form-control" id="inputPrecio" 
+                                   step="0.01" min="0" placeholder="0.00">
+                        </div>
+                        <div class="col-md-1">
+                            <label class="form-label">&nbsp;</label>
+                            <button type="button" class="btn-modern btn-success" style="width: 100%;" 
+                                    onclick="agregarDetalle()">
+                                <i class="bi bi-plus"></i>
+                            </button>
+                        </div>
+                    </div>
+
+                    <table class="detalle-table" id="tablaDetalle">
+                        <thead>
+                            <tr>
+                                <th>Producto</th>
+                                <th>Cantidad</th>
+                                <th>Precio</th>
+                                <th>Subtotal</th>
+                                <th>Acción</th>
+                            </tr>
+                        </thead>
+                        <tbody id="detalleBody">
+                            <tr>
+                                <td colspan="5" style="text-align: center; color: var(--gray);">
+                                    No hay productos agregados
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+
+                    <div class="total-box">
+                        <div class="total-label">TOTAL</div>
+                        <div class="total-value">$<span id="totalGeneral">0.00</span></div>
+                    </div>
+
+                    <!-- Acciones -->
+                    <div style="display: flex; gap: 15px; justify-content: flex-end; margin-top: 30px; padding-top: 30px; border-top: 2px solid var(--gray-light);">
+                        <a href="/movimientos" class="btn-modern btn-secondary">
+                            <i class="bi bi-x-circle"></i> Cancelar
+                        </a>
+                        <button type="submit" class="btn-modern" 
+                                th:classappend="${tipo == 'ENTRADA'} ? 'btn-success' : 'btn-danger'">
+                            <i class="bi bi-save"></i> Guardar Movimiento
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        let detalles = [];
+        let contadorDetalle = 0;
+
+        // Cuando se selecciona un producto, cargar su precio
+        document.getElementById('selectProducto').addEventListener('change', function() {
+            const option = this.options[this.selectedIndex];
+            const precio = option.getAttribute('data-precio');
+            if (precio) {
+                document.getElementById('inputPrecio').value = precio;
+            }
+        });
+
+        function agregarDetalle() {
+            const selectProducto = document.getElementById('selectProducto');
+            const inputCantidad = document.getElementById('inputCantidad');
+            const inputPrecio = document.getElementById('inputPrecio');
+
+            if (!selectProducto.value || !inputCantidad.value || !inputPrecio.value) {
+                alert('Por favor complete todos los campos');
+                return;
+            }
+
+            const productoId = selectProducto.value;
+            const productoNombre = selectProducto.options[selectProducto.selectedIndex].text;
+            const cantidad = parseInt(inputCantidad.value);
+            const precio = parseFloat(inputPrecio.value);
+            const subtotal = cantidad * precio;
+
+            // Verificar si ya existe el producto
+            if (detalles.some(d => d.productoId === productoId)) {
+                alert('Este producto ya fue agregado');
+                return;
+            }
+
+            const detalle = {
+                id: contadorDetalle++,
+                productoId: productoId,
+                productoNombre: productoNombre,
+                cantidad: cantidad,
+                precio: precio,
+                subtotal: subtotal
+            };
+
+            detalles.push(detalle);
+            actualizarTabla();
+            limpiarFormulario();
+        }
+
+        function eliminarDetalle(id) {
+            detalles = detalles.filter(d => d.id !== id);
+            actualizarTabla();
+        }
+
+        function actualizarTabla() {
+            const tbody = document.getElementById('detalleBody');
+            
+            if (detalles.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="5" style="text-align: center; color: var(--gray);">No hay productos agregados</td></tr>';
+                document.getElementById('totalGeneral').textContent = '0.00';
+                return;
+            }
+
+            let html = '';
+            let total = 0;
+
+            detalles.forEach(detalle => {
+                total += detalle.subtotal;
+                html += `
+                    <tr>
+                        <td>
+                            ${detalle.productoNombre}
+                            <input type="hidden" name="detalles[${detalle.id}].producto.id" value="${detalle.productoId}">
+                        </td>
+                        <td>
+                            ${detalle.cantidad}
+                            <input type="hidden" name="detalles[${detalle.id}].cantidad" value="${detalle.cantidad}">
+                        </td>
+                        <td>
+                            $${detalle.precio.toFixed(2)}
+                            <input type="hidden" name="detalles[${detalle.id}].precioUnitario" value="${detalle.precio}">
+                        </td>
+                        <td>$${detalle.subtotal.toFixed(2)}</td>
+                        <td>
+                            <button type="button" class="btn-modern btn-danger" style="padding: 6px 12px;" 
+                                    onclick="eliminarDetalle(${detalle.id})">
+                                <i class="bi bi-trash"></i>
+                            </button>
+                        </td>
+                    </tr>
+                `;
+            });
+
+            tbody.innerHTML = html;
+            document.getElementById('totalGeneral').textContent = total.toLocaleString('es-CO', {minimumFractionDigits: 2, maximumFractionDigits: 2});
+        }
+
+        function limpiarFormulario() {
+            document.getElementById('selectProducto').value = '';
+            document.getElementById('inputCantidad').value = '1';
+            document.getElementById('inputPrecio').value = '';
+        }
+
+        // Validar antes de enviar
+        document.getElementById('movimientoForm').addEventListener('submit', function(e) {
+            if (detalles.length === 0) {
+                e.preventDefault();
+                alert('Debe agregar al menos un producto');
+            }
+        });
+    </script>
+</body>
+</html>

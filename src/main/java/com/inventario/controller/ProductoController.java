@@ -2,11 +2,16 @@ package com.inventario.controller;
 
 import com.inventario.model.Producto;
 import com.inventario.service.ProductoService;
+import com.inventario.service.CategoriaService;
+import com.inventario.service.ProveedorService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
+
+import jakarta.validation.Valid;
 import java.util.List;
 import java.util.Optional;
 
@@ -15,85 +20,232 @@ import java.util.Optional;
 public class ProductoController {
 
     @Autowired
-    private ProductoService service;
+    private ProductoService productoService;
+    
+    @Autowired
+    private CategoriaService categoriaService;
+    
+    @Autowired
+    private ProveedorService proveedorService;
 
     // GET - Listar todos (Vista HTML)
     @GetMapping
     public String listar(Model model) {
-        List<Producto> productos = service.listarTodos();
-        model.addAttribute("productos", productos);
-        return "productos/listado";
+        try {
+            List<Producto> productos = productoService.listarActivos();
+            model.addAttribute("productos", productos);
+            return "productos/listado";
+        } catch (Exception e) {
+            e.printStackTrace();
+            model.addAttribute("error", "Error al cargar productos: " + e.getMessage());
+            model.addAttribute("productos", List.of());
+            return "productos/listado";
+        }
     }
 
     // GET - Formulario nuevo producto
     @GetMapping("/nuevo")
     public String nuevoForm(Model model) {
-        model.addAttribute("producto", new Producto());
-        return "productos/formulario";
+        try {
+            model.addAttribute("producto", new Producto());
+            model.addAttribute("categorias", categoriaService.listarActivos());
+            model.addAttribute("proveedores", proveedorService.listarActivos());
+            return "productos/formulario";
+        } catch (Exception e) {
+            e.printStackTrace();
+            model.addAttribute("error", "Error al cargar el formulario: " + e.getMessage());
+            return "redirect:/productos";
+        }
     }
 
     // POST - Crear producto
     @PostMapping
-    public String crear(@ModelAttribute Producto producto, 
+    public String crear(@Valid @ModelAttribute("producto") Producto producto, 
+                       BindingResult result,
+                       Model model,
                        RedirectAttributes redirect) {
+        
+        // Log para debug
+        System.out.println("=== CREAR PRODUCTO ===");
+        System.out.println("Código: " + producto.getCodigo());
+        System.out.println("Nombre: " + producto.getNombre());
+        System.out.println("Precio: " + producto.getPrecioVenta());
+        
+        // Si hay errores de validación
+        if (result.hasErrors()) {
+            System.out.println("Errores de validación:");
+            result.getAllErrors().forEach(error -> 
+                System.out.println("- " + error.getDefaultMessage())
+            );
+            
+            model.addAttribute("categorias", categoriaService.listarActivos());
+            model.addAttribute("proveedores", proveedorService.listarActivos());
+            return "productos/formulario";
+        }
+        
         try {
-            service.crear(producto);
+            // Validaciones adicionales
+            if (producto.getStockActual() == null) {
+                producto.setStockActual(0);
+            }
+            if (producto.getStockMinimo() == null) {
+                producto.setStockMinimo(0);
+            }
+            if (producto.getActivo() == null) {
+                producto.setActivo(true);
+            }
+            
+            // Guardar el producto
+            Producto productoGuardado = productoService.crear(producto);
+            
+            System.out.println("Producto guardado exitosamente con ID: " + productoGuardado.getId());
+            
             redirect.addFlashAttribute("mensaje", "Producto creado exitosamente");
             redirect.addFlashAttribute("tipo", "success");
+            
+            return "redirect:/productos";
+            
         } catch (Exception e) {
-            redirect.addFlashAttribute("mensaje", "Error: " + e.getMessage());
+            e.printStackTrace();
+            System.err.println("Error al guardar producto: " + e.getMessage());
+            
+            redirect.addFlashAttribute("mensaje", "Error al crear producto: " + e.getMessage());
             redirect.addFlashAttribute("tipo", "error");
+            
+            model.addAttribute("categorias", categoriaService.listarActivos());
+            model.addAttribute("proveedores", proveedorService.listarActivos());
+            
+            return "productos/formulario";
         }
-        return "redirect:/productos";
     }
 
     // GET - Formulario editar
     @GetMapping("/{id}/editar")
-    public String editarForm(@PathVariable Integer id, Model model,
-                            RedirectAttributes redirect) {
-        Optional<Producto> p = service.obtenerPorId(id);
-        if (p.isPresent()) {
-            model.addAttribute("producto", p.get());
+    public String editarForm(@PathVariable Integer id, Model model, RedirectAttributes redirect) {
+        try {
+            Optional<Producto> productoOpt = productoService.obtenerPorId(id);
+            
+            if (!productoOpt.isPresent()) {
+                redirect.addFlashAttribute("mensaje", "Producto no encontrado con ID: " + id);
+                redirect.addFlashAttribute("tipo", "error");
+                return "redirect:/productos";
+            }
+            
+            model.addAttribute("producto", productoOpt.get());
+            model.addAttribute("categorias", categoriaService.listarActivos());
+            model.addAttribute("proveedores", proveedorService.listarActivos());
+            
             return "productos/formulario";
+            
+        } catch (Exception e) {
+            e.printStackTrace();
+            redirect.addFlashAttribute("mensaje", "Error al cargar producto: " + e.getMessage());
+            redirect.addFlashAttribute("tipo", "error");
+            return "redirect:/productos";
         }
-        redirect.addFlashAttribute("mensaje", "Producto no encontrado");
-        redirect.addFlashAttribute("tipo", "error");
-        return "redirect:/productos";
     }
 
-    // PUT - Actualizar producto
+    // POST - Actualizar producto
     @PostMapping("/{id}")
     public String actualizar(@PathVariable Integer id,
-                            @ModelAttribute Producto producto,
+                            @Valid @ModelAttribute("producto") Producto producto,
+                            BindingResult result,
+                            Model model,
                             RedirectAttributes redirect) {
+        
+        System.out.println("=== ACTUALIZAR PRODUCTO ===");
+        System.out.println("ID: " + id);
+        System.out.println("Código: " + producto.getCodigo());
+        
+        if (result.hasErrors()) {
+            model.addAttribute("categorias", categoriaService.listarActivos());
+            model.addAttribute("proveedores", proveedorService.listarActivos());
+            return "productos/formulario";
+        }
+        
         try {
-            service.actualizar(id, producto);
+            Producto productoActualizado = productoService.actualizar(id, producto);
+            
+            System.out.println("Producto actualizado exitosamente: " + productoActualizado.getId());
+            
             redirect.addFlashAttribute("mensaje", "Producto actualizado exitosamente");
             redirect.addFlashAttribute("tipo", "success");
+            
+            return "redirect:/productos";
+            
         } catch (Exception e) {
-            redirect.addFlashAttribute("mensaje", "Error: " + e.getMessage());
+            e.printStackTrace();
+            System.err.println("Error al actualizar producto: " + e.getMessage());
+            
+            redirect.addFlashAttribute("mensaje", "Error al actualizar: " + e.getMessage());
             redirect.addFlashAttribute("tipo", "error");
+            
+            model.addAttribute("categorias", categoriaService.listarActivos());
+            model.addAttribute("proveedores", proveedorService.listarActivos());
+            
+            return "productos/formulario";
         }
-        return "redirect:/productos";
     }
 
-    // DELETE - Eliminar producto
+    // GET - Eliminar producto (soft delete)
     @GetMapping("/{id}/eliminar")
     public String eliminar(@PathVariable Integer id, RedirectAttributes redirect) {
         try {
-            service.eliminar(id);
+            System.out.println("=== ELIMINAR PRODUCTO ===");
+            System.out.println("ID: " + id);
+            
+            productoService.eliminar(id);
+            
             redirect.addFlashAttribute("mensaje", "Producto eliminado exitosamente");
             redirect.addFlashAttribute("tipo", "success");
+            
         } catch (Exception e) {
-            redirect.addFlashAttribute("mensaje", "Error: " + e.getMessage());
+            e.printStackTrace();
+            System.err.println("Error al eliminar producto: " + e.getMessage());
+            
+            redirect.addFlashAttribute("mensaje", "Error al eliminar: " + e.getMessage());
             redirect.addFlashAttribute("tipo", "error");
         }
+        
         return "redirect:/productos";
     }
 
-    // GET - Home
-    @GetMapping("/")
-    public String home() {
-        return "redirect:/productos";
+    // GET - Ver detalle
+    @GetMapping("/{id}/detalle")
+    public String verDetalle(@PathVariable Integer id, Model model, RedirectAttributes redirect) {
+        try {
+            Optional<Producto> productoOpt = productoService.obtenerPorId(id);
+            
+            if (!productoOpt.isPresent()) {
+                redirect.addFlashAttribute("mensaje", "Producto no encontrado");
+                redirect.addFlashAttribute("tipo", "error");
+                return "redirect:/productos";
+            }
+            
+            model.addAttribute("producto", productoOpt.get());
+            return "productos/detalle";
+            
+        } catch (Exception e) {
+            e.printStackTrace();
+            redirect.addFlashAttribute("mensaje", "Error: " + e.getMessage());
+            redirect.addFlashAttribute("tipo", "error");
+            return "redirect:/productos";
+        }
+    }
+
+    // GET - Buscar productos
+    @GetMapping("/buscar")
+    public String buscar(@RequestParam String termino, Model model) {
+        try {
+            List<Producto> productos = productoService.buscar(termino);
+            model.addAttribute("productos", productos);
+            model.addAttribute("termino", termino);
+            return "productos/listado";
+        } catch (Exception e) {
+            e.printStackTrace();
+            model.addAttribute("error", "Error en la búsqueda: " + e.getMessage());
+            model.addAttribute("productos", List.of());
+            return "productos/listado";
+        }
     }
 }
